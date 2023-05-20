@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html  >
+{% include 'header.html' %}
+
+</br>
+</br>
+</br>
+</br>
+</br>
+<center>
+<div id='loginform' class='item-title mbr-fonts-style display-7 align-items-center'>
+<h1><strong>Register</strong></h1>
+</br>
+</br>
+Please use the form below to register an account.
+</br>
+</br>
+</br>
+<center>
+
+<label for="email" class="col-sm-2 col-form-label"><strong>Email address</strong></label>
+<div class="col-sm-3">
+	<input type="email" class="form-control" id="email">
+</div>
+</br> 
+<label for="password" class="col-sm-2 col-form-label"><strong>Password</strong></label>
+<div class="col-sm-3">
+  <input type="password" class="form-control" id="password">
+</div>
+</br> 
+<label for="confirm_password" class="col-sm-2 col-form-label"><strong>Confirm Password</strong></label>
+<div class="col-sm-3">
+  <input type="password" class="form-control" id="confirm_password">
+</div>
+
+</center>
+</br>
+</br>
+<button type=submit class="btn btn-primary display-4" id="toggle" onclick="registerUser()"><strong>Register</strong></button>
+</br>
+</br>
+Wanting to login? <a href='{{base_url}}/login'>click here.</a>
+</br>
+</br>
+</div>
+</center>
+
+
+</br>
+</br>
+
+<script>
+function validateEmail(email) {
+  var re = /\S+@\S+\.\S+/;
+  return re.test(email);
+}
+
+function registerUser() {
+
+  email=document.getElementById('email').value
+  password=document.getElementById('password').value
+  confirm_password=document.getElementById('confirm_password').value
+
+  if (validateEmail(email) === true && password != '' && password.length > 5 && password === confirm_password) {
+
+    let data = {"email": email,
+                  "password": password,
+                  "confirm_password": confirm_password};
+
+    let confirm = {"email": email}
+    console.log(data);
+    fetch("/api/user/create", {
+      method: "POST",
+      headers: {'Content-Type': 'application/json'}, 
+      body: JSON.stringify(data)
+    }).then(res => {
+      console.log("Response:", res);
+    }).then(fetch("/api/user/confirm/email", {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(confirm)})).then(function() {window.location = "/confirm_email";})
+
+  } else if (validateEmail(email) === false) {
+    Swal.fire({icon: "error",
+              title: "You did not enter a valid email",
+              text: "Please create an account with a valid email.",
+              confirmButtonColor: '#2d80f9',
+              confirmButtonText: 'close'}).then(function() {window.location = "/register";}); 
+  } else if (password != confirm_password) {
+    Swal.fire({icon: "error",
+              title: "Passwords do not match",
+              text: "Please create retype passwords.",
+              confirmButtonColor: '#2d80f9',
+              confirmButtonText: 'close'}).then(function() {window.location = "/register";}); 
+  } else if (password.length <= 5 && password === confirm_pasword) {
+    Swal.fire({icon: "error",
+              title: "Passwords length needs to be more than 5 characters",
+              text: "Please recreate a password.",
+              confirmButtonColor: '#2d80f9',
+              confirmButtonText: 'close'}).then(function() {window.location = "/register";}); 
+  } 
+};
+</script>
+
+</html>
