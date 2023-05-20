@@ -23,10 +23,13 @@
   <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/">History</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/">History</a>
+        <a class="nav-link" href="/">Commands</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/">API docs</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/logout">Logout</a>
@@ -93,6 +96,7 @@
           mediaRecorder.start();
 
           recordBtn.disabled = true;
+          playBtn.disabled = true;
           stopBtn.disabled = false;
         })
         .catch(function(err) {
@@ -112,6 +116,8 @@
         playBtn.disabled = false;
 
         createWaveform();
+        // continue streaming back-to-back
+        // recordBtn.click();
       });
     }
 
