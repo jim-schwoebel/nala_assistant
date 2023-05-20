@@ -50,3 +50,40 @@ def email_is_valid(email):
     except EmailNotValidError as e:
       message=str(e)
       return message, False 
+
+# hashing functions for users/passwords
+def hash_password(password: str) -> str:
+    return generate_password_hash(password)
+    
+def verify_password(password_hash: str, password: str):
+    return check_password_hash(password_hash, password)
+
+def uuid4() -> str:
+    return str(uuid.uuid4())
+
+def is_valid_uuid(uuid_to_test, version=4):
+    """
+    Check if uuid_to_test is a valid UUID.
+    
+     Parameters
+    ----------
+    uuid_to_test : str
+    version : {1, 2, 3, 4}
+    
+     Returns
+    -------
+    `True` if uuid_to_test is a valid UUID, otherwise `False`.
+    
+     Examples
+    --------
+    >>> is_valid_uuid('c9bf9e57-1685-4c89-bafb-ff5af830be8a')
+    True
+    >>> is_valid_uuid('c9bf9e58')
+    False
+    """
+    
+    try:
+        uuid_obj = UUID(uuid_to_test, version=version)
+    except ValueError:
+        return False
+    return str(uuid_obj) == uuid_to_test
