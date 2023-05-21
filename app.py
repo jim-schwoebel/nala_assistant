@@ -23,6 +23,14 @@ from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 from datetime import timedelta
 
+# minio
+from minio import Minio
+from minio.error import S3Error
+
+# auth0 
+from authlib.integrations.starlette_client import OAuth
+from starlette.requests import Request
+
 # load environment vars in .env
 load_dotenv()
 
@@ -74,20 +82,32 @@ def get_db():
     finally:
         db.close()
 
-
 # add https redirect middleware for routing to https
 # app.add_middleware(HTTPSRedirectMiddleware)
 
-# audio routes for openAI -> Bark
-	# fastapi 
-	# minio
-	# auth0
-	# sqlite database
+# setup minio instance
+minio_client = Minio(
+    "your-minio-url",
+    access_key="your-access-key",
+    secret_key="your-secret-key",
+    secure=False  # Set to True if your Minio server uses HTTPS
+)
+
+# setup auth0 instance
+oauth = OAuth()
+auth0 = oauth.register(
+    'auth0',
+    client_id='YOUR_AUTH0_CLIENT_ID',
+    client_secret='YOUR_AUTH0_CLIENT_SECRET',
+    api_base_url='https://YOUR_AUTH0_DOMAIN',
+    access_token_url='https://YOUR_AUTH0_DOMAIN/oauth/token',
+    authorize_url='https://YOUR_AUTH0_DOMAIN/authorize',
+    client_kwargs={'scope': 'openid profile email'}
+)
 
 # front-end routes
 #############################
-# / 
-	# main page
+# /main page
 # user routes
 @app.get("/", response_class=HTMLResponse, 
                   tags=["templates"], 
@@ -101,8 +121,6 @@ def home(request: Request, db: Session = Depends(get_db)):
     request.session['nowtime'] = datetime.datetime.now().year
     return templates.TemplateResponse("home.html", {"request": request})
 
-# /docs 
-	# docs
 # /login
 	# logging in
 @app.get("/login", response_class=HTMLResponse, 
@@ -152,6 +170,10 @@ def bark_assistant(request: Request, db: Session = Depends(get_db)):
     request.session["base_url"] = "/"
     request.session['nowtime'] = datetime.datetime.now().year
     return templates.TemplateResponse("audio_wake.html", {"request": request})
+
+# /docs 
+    # docs
+
 
 # back-end routes 
 #############################
