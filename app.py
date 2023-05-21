@@ -93,7 +93,7 @@ def get_db():
                   tags=["templates"], 
                   status_code=200, 
                   include_in_schema=False)
-def home_page(request: Request, db: Session = Depends(get_db)):
+def home(request: Request, db: Session = Depends(get_db)):
     '''
         Home page.
     '''
@@ -109,7 +109,7 @@ def home_page(request: Request, db: Session = Depends(get_db)):
                   tags=["templates"], 
                   status_code=200, 
                   include_in_schema=False)
-def home_page(request: Request, db: Session = Depends(get_db)):
+def login(request: Request, db: Session = Depends(get_db)):
     '''
         Home page.
     '''
@@ -121,7 +121,7 @@ def home_page(request: Request, db: Session = Depends(get_db)):
                   tags=["templates"], 
                   status_code=200, 
                   include_in_schema=False)
-def home_page(request: Request, db: Session = Depends(get_db)):
+def logout(request: Request, db: Session = Depends(get_db)):
     '''
         Home page.
     '''
@@ -133,7 +133,7 @@ def home_page(request: Request, db: Session = Depends(get_db)):
                   tags=["templates"], 
                   status_code=200, 
                   include_in_schema=False)
-def home_page(request: Request, db: Session = Depends(get_db)):
+def register(request: Request, db: Session = Depends(get_db)):
     '''
         Home page.
     '''
@@ -145,7 +145,7 @@ def home_page(request: Request, db: Session = Depends(get_db)):
                   tags=["templates"], 
                   status_code=200, 
                   include_in_schema=False)
-def home_page(request: Request, db: Session = Depends(get_db)):
+def bark_assistant(request: Request, db: Session = Depends(get_db)):
     '''
         Home page.
     '''
