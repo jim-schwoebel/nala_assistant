@@ -168,12 +168,12 @@ def bark_assistant(request: Request, db: Session = Depends(get_db)):
 			# json {"token": str, "expires": str}, 201
 
 # main routes
-	# /api/audio/query (minio /upload)
-		# input
-			# audio file (blob)
-			# json (metadata)
-		# output 
-			# json, code (201)
+    # api/audio/upload (minio /upload)
+        # input
+            # audio file (blob)
+            # json (metadata)
+        # output 
+            # json, code (201)
 
 	# /api/audio/transcribe (minio /transcribe)
 		# input
