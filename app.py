@@ -88,6 +88,19 @@ def get_db():
 #############################
 # / 
 	# main page
+# user routes
+@app.get("/", response_class=HTMLResponse, 
+                  tags=["templates"], 
+                  status_code=200, 
+                  include_in_schema=False)
+def home_page(request: Request, db: Session = Depends(get_db)):
+    '''
+        Home page.
+    '''
+    request.session["base_url"] = "/"
+    request.session['nowtime'] = datetime.datetime.now().year
+    return templates.TemplateResponse("audio_wake.html", {"request": request})
+
 # /docs 
 	# docs
 # /login

@@ -64,126 +64,185 @@
 
   <audio id="audioPlayer"></audio>
 
-  <script>
-    var audioContext;
-    var mediaRecorder;
-    var chunks = [];
-    var audioBlob;
-    var waveform;
+<script>
+var audioContext;
+var mediaRecorder;
+var chunks = [];
+var audioBlob;
+var waveform;
 
-    // Initialize the audio context
-    function initAudioContext() {
-      if (typeof AudioContext !== 'undefined') {
-        audioContext = new AudioContext();
-      } else if (typeof webkitAudioContext !== 'undefined') {
-        audioContext = new webkitAudioContext();
-      } else {
-        console.error('Web Audio API is not supported in this browser.');
+// Initialize the audio context
+function initAudioContext() {
+  if (typeof AudioContext !== 'undefined') {
+    audioContext = new AudioContext();
+  } else if (typeof webkitAudioContext !== 'undefined') {
+    audioContext = new webkitAudioContext();
+  } else {
+    console.error('Web Audio API is not supported in this browser.');
+  }
+}
+
+// Start recording
+function startRecording() {
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+      mediaRecorder = new MediaRecorder(stream);
+      chunks = [];
+
+      mediaRecorder.addEventListener('dataavailable', function(e) {
+        chunks.push(e.data);
+      });
+
+      mediaRecorder.start();
+
+      // stop after inactivity
+      startRecognition();
+
+      recordBtn.disabled = true;
+      playBtn.disabled = true;
+      stopBtn.disabled = false;
+    })
+    .catch(function(err) {
+      console.error('Error accessing microphone: ', err);
+    });
+}
+
+// Stop recording
+function stopRecording() {
+  mediaRecorder.stop();
+
+  mediaRecorder.addEventListener('stop', function() {
+    audioBlob = new Blob(chunks, { type: mediaRecorder.mimeType });
+
+    recordBtn.disabled = false;
+    stopBtn.disabled = true;
+    playBtn.disabled = false;
+
+    createWaveform();
+    // continue streaming back-to-back
+    recordBtn.click();
+  });
+}
+
+// Play recorded audio
+function playAudio() {
+  // var audioElement = document.getElementById('audioPlayer');
+  // audioElement.src = URL.createObjectURL(audioBlob);
+  // audioElement.play();
+  document.getElementById("waveform").innerHTML = "";
+  var waveformElement = document.getElementById('waveform');
+  waveform = WaveSurfer.create({
+    container: waveformElement,
+    waveColor: 'violet',
+    progressColor: 'purple',
+    barHeight: 3,
+    height: 200,
+    responsive: true
+  });
+  waveform.loadBlob(audioBlob);
+  waveform.on('ready', function () {
+      waveform.play();
+  });
+}
+
+// Create waveform using Wavesurfer.js
+function createWaveform() {
+  playAudio();
+}
+
+// Wakeword detection
+function detectWakeword() {
+  document.getElementById('description').innerHTML = "<em><h4>now say <strong>hey nala</strong> to query</h4></em>"
+  document.getElementById('recordBtn').style.display = "none";
+  var recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = function(event) {
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        var transcript = event.results[i][0].transcript.toLowerCase();
+        if (transcript.includes('nala')) {
+          document.getElementById('description').innerHTML = "<em><h4>now make a query like <strong>make a song</strong></h4> and then press the stop button.</em>"
+          startRecording();
+          recognition.stop();
+          break;
+        }
       }
     }
+  };
 
-    // Start recording
-    function startRecording() {
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(function(stream) {
-          mediaRecorder = new MediaRecorder(stream);
-          chunks = [];
+  recognition.start();
+}
 
-          mediaRecorder.addEventListener('dataavailable', function(e) {
-            chunks.push(e.data);
-          });
+// Initialize audio context and event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  initAudioContext();
 
-          mediaRecorder.start();
+  var recordBtn = document.getElementById('recordBtn');
+  var stopBtn = document.getElementById('stopBtn');
+  var playBtn = document.getElementById('playBtn');
 
-          recordBtn.disabled = true;
-          playBtn.disabled = true;
-          stopBtn.disabled = false;
-        })
-        .catch(function(err) {
-          console.error('Error accessing microphone: ', err);
-        });
+  recordBtn.addEventListener('click', detectWakeword);
+  stopBtn.addEventListener('click', stopRecording);
+  playBtn.addEventListener('click', playAudio);
+});
+
+function startSilenceTimeout() {
+  const silenceDuration = 3000; // Adjust this value as needed (in milliseconds)
+
+  silenceTimeout = setTimeout(() => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      // Disable/enable buttons
+      stopRecording();
+      console.log('Recording stopped due to inactivity.');
     }
+  }, silenceDuration);
+}
 
-    // Stop recording
-    function stopRecording() {
+
+// Start speech recognition
+function startRecognition() {
+  recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+
+  // Speech recognition event handlers
+  recognition.onresult = (event) => {
+    const result = event.results[event.results.length - 1];
+    const transcript = result[0].transcript.trim();
+
+    if (transcript !== '') {
+      clearTimeout(silenceTimeout); // Reset silence detection timeout
+      startSilenceTimeout(); // Restart silence detection
+    }
+  };
+
+  recognition.onend = () => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      stopRecognition();
       mediaRecorder.stop();
 
-      mediaRecorder.addEventListener('stop', function() {
-        audioBlob = new Blob(chunks, { type: mediaRecorder.mimeType });
+      // Disable/enable buttons
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
 
-        recordBtn.disabled = false;
-        stopBtn.disabled = true;
-        playBtn.disabled = false;
-
-        createWaveform();
-        // continue streaming back-to-back
-        // recordBtn.click();
-      });
+      console.log('Recording stopped due to speech recognition end.');
     }
+  };
 
-    // Play recorded audio
-    function playAudio() {
-      // var audioElement = document.getElementById('audioPlayer');
-      // audioElement.src = URL.createObjectURL(audioBlob);
-      // audioElement.play();
-      document.getElementById("waveform").innerHTML = "";
-      var waveformElement = document.getElementById('waveform');
-      waveform = WaveSurfer.create({
-        container: waveformElement,
-        waveColor: 'violet',
-        progressColor: 'purple',
-        barHeight: 3,
-        height: 200,
-        responsive: true
-      });
-      waveform.loadBlob(audioBlob);
-      waveform.on('ready', function () {
-          waveform.play();
-      });
-    }
+  recognition.start();
+}
 
-    // Create waveform using Wavesurfer.js
-    function createWaveform() {
-      playAudio();
-    }
+// Stop speech recognition
+function stopRecognition() {
+  if (recognition) {
+    recognition.stop();
+    recognition = null;
+  }
+}
 
-    // Wakeword detection
-    function detectWakeword() {
-      document.getElementById('description').innerHTML = "<em><h4>now say <strong>hey nala</strong> to query</h4></em>"
-      var recognition = new webkitSpeechRecognition();
-      recognition.continuous = true;
-      recognition.lang = 'en-US';
 
-      recognition.onresult = function(event) {
-        for (var i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            var transcript = event.results[i][0].transcript.toLowerCase();
-            if (transcript.includes('nala')) {
-              document.getElementById('description').innerHTML = "<em><h4>now make a query like <strong>make a song</strong></h4> and then press the stop button.</em>"
-              startRecording();
-              recognition.stop();
-              break;
-            }
-          }
-        }
-      };
-
-      recognition.start();
-    }
-
-    // Initialize audio context and event listeners
-    document.addEventListener('DOMContentLoaded', function() {
-      initAudioContext();
-
-      var recordBtn = document.getElementById('recordBtn');
-      var stopBtn = document.getElementById('stopBtn');
-      var playBtn = document.getElementById('playBtn');
-
-      recordBtn.addEventListener('click', detectWakeword);
-      stopBtn.addEventListener('click', stopRecording);
-      playBtn.addEventListener('click', playAudio);
-    });
-  </script>
+</script>
 </center>
 </body>
 </html>
