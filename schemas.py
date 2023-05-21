@@ -35,11 +35,30 @@ class Query(BaseModel):
     class Config:
         orm_mode = True
 
-class Operation(BaseModel):
+class Query_Operation(BaseModel):
     id: UUID
     reference_query: UUID
     create_date: date
-    type_: Union[str, None] = None
+    name: Union[str, None] = None
+    meta: Union[str, None] = None
+    class Config:
+        orm_mode = True
+
+class Action(BaseModel):
+    id: UUID
+    reference_query: UUID
+    create_date: date
+    name: Union[str, None] = None
+    meta: Union[str, None] = None
+    integration: Union[str, None] = None
+    class Config:
+        orm_mode = True
+
+class Integration(BaseModel):
+    id: UUID
+    create_date: date
+    name: Union[str, None] = None
+    credentials: Union[str, None] = None
     class Config:
         orm_mode = True
 
@@ -50,7 +69,6 @@ class Operation(BaseModel):
 '''
 A place for all other pydantic schemas.
 '''
-
 class HTTPError(BaseModel):
     detail: str
     class Config:

@@ -99,18 +99,59 @@ def home_page(request: Request, db: Session = Depends(get_db)):
     '''
     request.session["base_url"] = "/"
     request.session['nowtime'] = datetime.datetime.now().year
-    return templates.TemplateResponse("audio_wake.html", {"request": request})
+    return templates.TemplateResponse("home.html", {"request": request})
 
 # /docs 
 	# docs
 # /login
 	# logging in
+@app.get("/login", response_class=HTMLResponse, 
+                  tags=["templates"], 
+                  status_code=200, 
+                  include_in_schema=False)
+def home_page(request: Request, db: Session = Depends(get_db)):
+    '''
+        Home page.
+    '''
+    return templates.TemplateResponse("login.html", {"request": request})
+
 # /logout
 	# logging out (session.clear())
+@app.get("/logout", response_class=HTMLResponse, 
+                  tags=["templates"], 
+                  status_code=200, 
+                  include_in_schema=False)
+def home_page(request: Request, db: Session = Depends(get_db)):
+    '''
+        Home page.
+    '''
+    return templates.TemplateResponse("logout.html", {"request": request})
+
 # /register
 	# register account
+@app.get("/register", response_class=HTMLResponse, 
+                  tags=["templates"], 
+                  status_code=200, 
+                  include_in_schema=False)
+def home_page(request: Request, db: Session = Depends(get_db)):
+    '''
+        Home page.
+    '''
+    return templates.TemplateResponse("register.html", {"request": request})
+
 # /bark
 	# stream
+@app.get("/bark", response_class=HTMLResponse, 
+                  tags=["templates"], 
+                  status_code=200, 
+                  include_in_schema=False)
+def home_page(request: Request, db: Session = Depends(get_db)):
+    '''
+        Home page.
+    '''
+    request.session["base_url"] = "/"
+    request.session['nowtime'] = datetime.datetime.now().year
+    return templates.TemplateResponse("audio_wake.html", {"request": request})
 
 # back-end routes 
 #############################

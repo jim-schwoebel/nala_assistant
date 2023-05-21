@@ -1,44 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@latest/font/bootstrap-icons.css">
-  <script src="https://cdn.jsdelivr.net/npm/wavesurfer.js"></script>
-  <style>
-    #waveform {
-      height: 200px;
-    }
-  </style>
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="/">&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-emoji-laughing"></i> Nala</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" href="/">History</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/">Commands</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/">API docs</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/logout">Logout</a>
-      </li>
-    </ul>
-  </div>
-</nav>
-
-
+{% include 'header.html' %}
 <center>
   <title>🦁 Nala</title>
 </head>
@@ -49,7 +11,7 @@
         <div id='description'><h4><em>Start by clicking the <strong>grant mic access</strong> button</em></h4></div>
         <hr></hr>
         <div class="d-flex flex-column align-items-center mt-4">
-          <button id="recordBtn" class="btn btn-danger-outline"><i class="bi bi-mic"></i> Grant mic access</button>
+          <button id="recordBtn" class="btn btn-danger-outline" onclick="chBackcolor('lightgray');"><i class="bi bi-mic"></i> Grant mic access</button>
           <button id="stopBtn" class="btn btn-black-outline" disabled><i class="bi bi-stop-circle"></i> Stop</button> 
           <button id="playBtn" class="btn btn-black-outline" disabled><i class="bi bi-play-circle"></i> Play</button>
         </div>
@@ -111,6 +73,7 @@ function startRecording() {
 
 // Stop recording
 function stopRecording() {
+  chBackcolor('lightgray');
   mediaRecorder.stop();
 
   mediaRecorder.addEventListener('stop', function() {
@@ -165,8 +128,7 @@ function detectWakeword() {
       if (event.results[i].isFinal) {
         var transcript = event.results[i][0].transcript.toLowerCase();
         if (transcript.includes('nala')) {
-          document.getElementById('description').innerHTML = "<em><h4>now make a query like <strong>make a song</strong></h4> and then press the stop button (or be quiet for 3 seconds) to end the query.</em>"
-          startRecording();
+          playChime();
           recognition.stop();
           break;
         }
@@ -222,11 +184,7 @@ function startRecognition() {
   recognition.onend = () => {
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       stopRecognition();
-      mediaRecorder.stop();
-
-      // Disable/enable buttons
-      stopBtn.disabled = true;
-
+      stopRecording();
       console.log('Recording stopped due to speech recognition end.');
     }
   };
@@ -242,7 +200,27 @@ function stopRecognition() {
   }
 }
 
+function chBackcolor(color) {
+   document.body.style.background = color;
+};
 
+var sound = new Howl({
+  src: ['/static/sounds/chime.wav'],
+  onplay: function() {
+    document.getElementById('description').innerHTML = "<em><h4>Hello! How can I help you?</h4></em>"
+    chBackcolor('#ffc2e5');
+
+  },
+  onend: function() {
+    document.getElementById('description').innerHTML = "<em><h4>now make a query like <strong>make a song</strong></h4> and then press the stop button (or be quiet for 3 seconds) to end the query.</em>"
+    chBackcolor('lightblue');
+    startRecording();
+  }
+});
+
+function playChime() {
+    sound.play();
+};
 </script>
 </center>
 </body>

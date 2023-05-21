@@ -38,12 +38,30 @@ class Query(Base):
 	create_date = Column(DateTime)
 	transcript = Column(String(128))
 	bucket = Column(String(128))
-	
-class Operation(Base):
+
+class Query_Operation(Base):
 	# query (hi.wav) -> transcribe (hi.wav / hi.json) -> bark_predict (hi.wav / hi.json)
 	# hi.json has k/v pair 
 	__tablename__ = 'operations'
 	id = Column(GUID, primary_key=True, default=GUID_DEFAULT_SQLITE)
-	reference_query=Column(GUID)
 	create_date = Column(DateTime)
-	type_= Column(String(128))
+	name = Column(String(128))
+	meta = Column(String(2048))
+	reference_query=Column(GUID)
+
+class Action(Base):
+	__tablename__ = 'actions'
+	id = Column(GUID, primary_key=True, default=GUID_DEFAULT_SQLITE)
+	create_date = Column(DateTime)
+	keyword = Column(String(128))
+	name = Column(String(128))
+	meta = Column(String(2048))
+	integration = Column(String(128))
+	reference_query = Column(GUID)
+
+class Integration(Base):
+	__tablename__ = 'integrations'
+	id = Column(GUID, primary_key=True, default=GUID_DEFAULT_SQLITE)
+	create_date = Column(DateTime)
+	name = Column(String(128))
+	credentials = Column(String(2048))
