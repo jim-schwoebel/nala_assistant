@@ -70,6 +70,8 @@ var mediaRecorder;
 var chunks = [];
 var audioBlob;
 var waveform;
+let silenceTimeout;
+let recognition;
 
 // Initialize the audio context
 function initAudioContext() {
