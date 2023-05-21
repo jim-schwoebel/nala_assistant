@@ -46,10 +46,10 @@
   <div class="container mt-5">
     <div class="row">
       <div class="col">
-        <div id='description'><h4><em>Start by <strong>clicking listen</strong></em></h4></div>
+        <div id='description'><h4><em>Start by clicking the <strong>grant mic access</strong> button</em></h4></div>
         <hr></hr>
         <div class="d-flex flex-column align-items-center mt-4">
-          <button id="recordBtn" class="btn btn-danger-outline"><i class="bi bi-mic"></i> Listen</button>
+          <button id="recordBtn" class="btn btn-danger-outline"><i class="bi bi-mic"></i> Grant mic access</button>
           <button id="stopBtn" class="btn btn-black-outline" disabled><i class="bi bi-stop-circle"></i> Stop</button> 
           <button id="playBtn" class="btn btn-black-outline" disabled><i class="bi bi-play-circle"></i> Play</button>
         </div>
@@ -165,7 +165,7 @@ function detectWakeword() {
       if (event.results[i].isFinal) {
         var transcript = event.results[i][0].transcript.toLowerCase();
         if (transcript.includes('nala')) {
-          document.getElementById('description').innerHTML = "<em><h4>now make a query like <strong>make a song</strong></h4> and then press the stop button.</em>"
+          document.getElementById('description').innerHTML = "<em><h4>now make a query like <strong>make a song</strong></h4> and then press the stop button (or be quiet for 3 seconds) to end the query.</em>"
           startRecording();
           recognition.stop();
           break;
@@ -225,7 +225,6 @@ function startRecognition() {
       mediaRecorder.stop();
 
       // Disable/enable buttons
-      startBtn.disabled = false;
       stopBtn.disabled = true;
 
       console.log('Recording stopped due to speech recognition end.');
