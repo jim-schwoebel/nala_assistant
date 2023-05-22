@@ -9,7 +9,7 @@ on top of the Bark AI model.
 
 import os, datetime, time, json, io, pandas, uvicorn, random, jwt
 from typing import List
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status, File, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -358,7 +358,7 @@ def session_create(token: str = Depends(reuseable_oauth), db: Session = Depends(
     }, 
     tags=["sessions"], 
     status_code=201)
-def query_create(payload: schemas.CreateQuery, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+def query_sample_create(payload: schemas.CreateQuery, file: UploadFile, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
     token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
     user = db.query(models.User).filter_by(email=token_payload['sub']).first()
 
@@ -385,8 +385,7 @@ def query_create(payload: schemas.CreateQuery, token: str = Depends(reuseable_oa
     db.commit()
 
     return schemas.Query(id=query.id, session_id=query.session_id, user_id=query.user_id, create_date=query.create_date, bucket=query.bucket)
-
-
+    
 # main routes
     # api/audio/upload (minio /upload)
         # input
