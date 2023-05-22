@@ -19,17 +19,6 @@ from email_validator import validate_email, EmailNotValidError
 '''
 Helpers related to querying data from the database.
 '''
-
-def token_is_valid(request, db):
-    token_id=request.session.get('token_id')
-    token=db.query(models.Api_Key).filter(models.Api_Key.token_id == token_id).first()
-    nowtime=datetime.datetime.now()
-    if token and token.expiration_date > nowtime:
-        return True, token
-    else:
-        token=None
-        return False, token
-
 def url_is_valid(url):
     if type(url) is str:
         validation = validators.url(url)
@@ -87,3 +76,18 @@ def is_valid_uuid(uuid_to_test, version=4):
     except ValueError:
         return False
     return str(uuid_obj) == uuid_to_test
+
+########################################
+##       Main back-end functions      ##
+########################################
+def transcribe_audio(audio_file) -> str:
+    transcript=''
+    return transcript 
+
+def query_chatgpt4(audio_file) -> str:
+    query=''
+    return query
+
+def query_bark(transcript) -> str:
+    query=''
+    return query

@@ -27,8 +27,14 @@ class User(BaseModel):
     class Config:
         orm_mode = True
 
+class Session(BaseModel):
+    id: UUID
+    user_id: UUID
+    create_date: date
+    
 class Query(BaseModel):
     id: UUID
+    session_id: UUID
     create_date: date
     transcript: Union[str, None] = None
     bucket: str

@@ -13,8 +13,8 @@ should align with schemas.py.
 class User(Base):
 	__tablename__ = 'users'
 	id = Column(GUID, primary_key=True, default=GUID_DEFAULT_SQLITE)
-	user_id=Column(String(128))
-	reset_id=Column(String(128))
+	user_id=Column(GUID)
+	reset_id=Column(GUID)
 	create_date = Column(DateTime)
 
 	# get information 
@@ -32,9 +32,16 @@ class User(Base):
 	def verify_password(self, password):
 		return check_password_hash(self.password_hash, password)
 
+class Session(Base):
+	__tablename__ = 'sessions'
+	id = Column(GUID, primary_key=True, default=GUID_DEFAULT_SQLITE)
+	user_id=Column(GUID)
+	create_date = Column(DateTime)
+
 class Query(Base):
 	__tablename__ = 'queries'
 	id = Column(GUID, primary_key=True, default=GUID_DEFAULT_SQLITE)
+	session_id=Column(GUID)
 	create_date = Column(DateTime)
 	transcript = Column(String(128))
 	bucket = Column(String(128))
@@ -42,15 +49,15 @@ class Query(Base):
 class Query_Operation(Base):
 	# query (hi.wav) -> transcribe (hi.wav / hi.json) -> bark_predict (hi.wav / hi.json)
 	# hi.json has k/v pair 
-	__tablename__ = 'operations'
+	__tablename__ = 'query_operations'
 	id = Column(GUID, primary_key=True, default=GUID_DEFAULT_SQLITE)
 	create_date = Column(DateTime)
 	name = Column(String(128))
 	meta = Column(String(2048))
 	reference_query=Column(GUID)
 
-class Action(Base):
-	__tablename__ = 'actions'
+class Query_Action(Base):
+	__tablename__ = 'query_actions'
 	id = Column(GUID, primary_key=True, default=GUID_DEFAULT_SQLITE)
 	create_date = Column(DateTime)
 	keyword = Column(String(128))
