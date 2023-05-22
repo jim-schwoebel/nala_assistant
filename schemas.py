@@ -31,7 +31,9 @@ class Session(BaseModel):
     id: UUID
     user_id: UUID
     create_date: date
-    
+    class Config:
+        orm_mode = True
+
 class Query(BaseModel):
     id: UUID
     session_id: UUID
@@ -100,8 +102,9 @@ class LoginUser(BaseModel):
     password: str
 
 # create api keys
-class LoginToken(BaseModel):
-    login_token: str
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
     expires: date
 
 # token for requests

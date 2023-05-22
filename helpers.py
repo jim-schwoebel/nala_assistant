@@ -8,7 +8,8 @@ import uuid, datetime, secrets, os, requests, simplejson, smtplib, json, validat
 from sqlalchemy import desc
 from uuid import UUID
 import pandas as pd
- 
+from datetime import timedelta 
+
 # for db queries 
 import models
 from email_validator import validate_email, EmailNotValidError
@@ -76,6 +77,15 @@ def is_valid_uuid(uuid_to_test, version=4):
     except ValueError:
         return False
     return str(uuid_obj) == uuid_to_test
+
+
+# Helper functions
+def create_access_token(data: dict, expires_delta: timedelta):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
 
 ########################################
 ##       Main back-end functions      ##

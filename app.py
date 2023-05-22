@@ -7,7 +7,7 @@ Demonstrating a first-in-kind implementation of voice assistants
 on top of the Bark AI model.
 '''
 
-import os, datetime, time, json, io, pandas, uvicorn, random
+import os, datetime, time, json, io, pandas, uvicorn, random, jwt
 from typing import List
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
@@ -16,12 +16,15 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from passlib.context import CryptContext
 from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import asc, desc, or_
 from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 from datetime import timedelta
+
 
 # minio
 from minio import Minio
@@ -57,10 +60,7 @@ app = FastAPI(
     version="0.0.2",
     terms_of_service="http://example.com/terms/",
     contact={"url": "https://barkassistant.com"},
-    openapi_tags=tags_metadata,
-    docs_url=None, 
-    redoc_url=None
-)
+    openapi_tags=tags_metadata)
 
 app.add_middleware(SessionMiddleware, secret_key=os.getenv('SESSION_SECRET'))
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -104,6 +104,15 @@ auth0 = oauth.register(
     authorize_url='https://YOUR_AUTH0_DOMAIN/authorize',
     client_kwargs={'scope': 'openid profile email'}
 )
+
+# jwt 
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("JWT_TOKEN_EXPIRE")
+
+# Security
+security = HTTPBearer()
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # front-end routes
 #############################
@@ -187,17 +196,56 @@ def bark_assistant(request: Request, db: Session = Depends(get_db)):
 
 # back-end routes 
 #############################
-# user registration (auth0)
-	# /api/login
-		# input
-			# json {username: str, password: str}
-		# output 
-			# login token
-	# /api/register
-		# input
-			# json {username: str, password: str, confirm_password: str}
-		# output
-			# json {"token": str, "expires": str}, 201
+@app.post("/api/user/login", 
+    responses={
+        200: {"model": schemas.LoginResponse},
+        401: {
+            "model": schemas.HTTPError,
+            "description": "Incorrect password for user",
+        },
+        404: {
+            "model": schemas.HTTPError,
+            "description": "User does not exist",
+        },
+    }, 
+    tags=["users"], 
+    status_code=200)
+def login(payload: schemas.LoginUser, db: Session = Depends(get_db)):
+    user=db.query(models.User).filter(models.User.email ==  payload.email).first()
+    if helpers.verify_password(user.password_hash, payload.password):
+        pass
+    else:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    access_token = helpers.create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    response=schemas.LoginResponse(access_token=access_token, token_type="bearer", expires=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    return response
+
+# @app.get("/api/protected",
+#     responses={
+#         200: {"model": schemas.LoginResponse},
+#         401: {
+#             "model": schemas.HTTPError,
+#             "description": "Incorrect password for user",
+#         },
+#         404: {
+#             "model": schemas.HTTPError,
+#             "description": "User does not exist",
+#         },
+#     }, 
+#     tags=["users"], 
+#     status_code=200)
+# def protected(credentials: HTTPAuthorizationCredentials = security):
+#     try:
+#         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+#         username = payload.get("sub")
+#         user = db.query(models.User).filter(models.User.email ==  username).first()
+#         if not user:
+#             raise HTTPException(status_code=401, detail="Invalid token")
+#         return {"message": "Hello, {}! You accessed the protected route.".format(username)}
+#     except jwt.ExpiredSignatureError:
+#         raise HTTPException(status_code=401, detail="Token has expired")
+#     except (jwt.DecodeError, jwt.InvalidTokenError):
+#         raise HTTPException
 
 # main routes
     # api/audio/upload (minio /upload)
