@@ -34,7 +34,7 @@ Please use the form below to log into your account.
 <button type=submit class="btn btn-primary display-4" id="toggle" onclick="loginUser()"><strong>Log in</strong></button>
 </br>
 </br>
-Forgot password? <a href='{{request.session.get("base_url")}}/reset'>reset it here.</a>
+Forgot password? <a href='/reset'>reset it here.</a>
 </br>
 </br>
 </div>
@@ -101,7 +101,7 @@ function loginUser() {
     headers: {'Content-Type': 'application/json'}, 
     body: JSON.stringify(data)})
   .then((response) => response.json())
-  .then((data) => window.location.replace('/create_session?token_id='+data.login_token+'&email='+email))
+  .then((data) => window.location.replace('/bark?token_id='+data.login_token+'&email='+email))
 };
 
 // redirect to home page

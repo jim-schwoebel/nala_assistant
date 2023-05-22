@@ -157,6 +157,16 @@ def register(request: Request, db: Session = Depends(get_db)):
     '''
     return templates.TemplateResponse("register.html", {"request": request})
 
+@app.get("/reset", response_class=HTMLResponse, 
+                  tags=["templates"], 
+                  status_code=200, 
+                  include_in_schema=False)
+def reset(request: Request, db: Session = Depends(get_db)):
+    '''
+        Home page.
+    '''
+    return templates.TemplateResponse("reset.html", {"request": request})
+
 # /bark
 	# stream
 @app.get("/bark", response_class=HTMLResponse, 
