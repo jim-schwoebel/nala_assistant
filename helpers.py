@@ -3,12 +3,15 @@ Master place to write any helper functions for use in the main code base.
 
 Helps to clean up the code base a little bit ;-)
 '''
+from fastapi import HTTPException, status
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid, datetime, secrets, os, requests, simplejson, smtplib, json, validators
 from sqlalchemy import desc
 from uuid import UUID
 import pandas as pd
+import datetime, jwt
 from datetime import timedelta 
+from typing import Union, Any
 
 # for db queries 
 import models
@@ -40,6 +43,9 @@ def email_is_valid(email):
     except EmailNotValidError as e:
       message=str(e)
       return message, False 
+
+def get_date():
+    return datetime.datetime.now() 
 
 # hashing functions for users/passwords
 def hash_password(password: str) -> str:
@@ -80,12 +86,35 @@ def is_valid_uuid(uuid_to_test, version=4):
 
 
 # Helper functions
-def create_access_token(data: dict, expires_delta: timedelta):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+def create_access_token(subject: Union[str, Any], ALGORITHM: str, JWT_SECRET_KEY: str, minutes: int = None) -> str:
+    expires = datetime.datetime.utcnow() + timedelta(minutes=minutes)
+    to_encode = {"exp": expires, "sub": str(subject)}
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, ALGORITHM)
     return encoded_jwt
+
+def create_refresh_token(subject: Union[str, Any], ALGORITHM: str, JWT_REFRESH_SECRET_KEY: str, minutes: int = None) -> str:
+    expires = datetime.datetime.utcnow() + timedelta(minutes=minutes)
+    to_encode = {"exp": expires, "sub": str(subject)}
+    encoded_jwt = jwt.encode(to_encode, JWT_REFRESH_SECRET_KEY, ALGORITHM)
+    return encoded_jwt
+
+def token_decode(token: str, JWT_SECRET_KEY: str, ALGORITHM: str):
+    try:
+        payload = jwt.decode(
+            token, JWT_SECRET_KEY, algorithms=[ALGORITHM]
+        )
+        if datetime.datetime.fromtimestamp(payload['exp']) < datetime.datetime.now():
+            raise HTTPException(
+                status_code = status.HTTP_401_UNAUTHORIZED,
+                detail="Token expired",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    except:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
+                            detail="Could not validate credentials", 
+                            headers={"WWW-Authenticate": "Bearer"})
+
+    return payload
 
 ########################################
 ##       Main back-end functions      ##

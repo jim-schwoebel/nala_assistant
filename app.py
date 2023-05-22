@@ -9,14 +9,14 @@ on top of the Bark AI model.
 
 import os, datetime, time, json, io, pandas, uvicorn, random, jwt
 from typing import List
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from passlib.context import CryptContext
 from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import Session
@@ -105,10 +105,18 @@ auth0 = oauth.register(
     client_kwargs={'scope': 'openid profile email'}
 )
 
-# jwt 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+# JWT
+ACCESS_TOKEN_EXPIRE_MINUTES = 60  # 60 minutes
+REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("JWT_TOKEN_EXPIRE")
+JWT_SECRET_KEY = os.environ['JWT_SECRET_KEY']   
+JWT_REFRESH_SECRET_KEY = os.environ['JWT_REFRESH_SECRET_KEY']   
+
+# Auth
+reuseable_oauth = OAuth2PasswordBearer(
+    tokenUrl="/login",
+    scheme_name="JWT"
+)
 
 # Security
 security = HTTPBearer()
@@ -196,6 +204,48 @@ def bark_assistant(request: Request, db: Session = Depends(get_db)):
 
 # back-end routes 
 #############################
+@app.post("/api/user/register", 
+    responses={
+        200: {"model": schemas.LoginResponse},
+        401: {
+            "model": schemas.HTTPError,
+            "description": "Incorrect password for user",
+        },
+        404: {
+            "model": schemas.HTTPError,
+            "description": "User does not exist",
+        },
+    }, 
+    tags=["users"], 
+    status_code=200)
+def register(payload: schemas.CreateUser, db: Session = Depends(get_db)):
+    user=db.query(models.User).filter(models.User.email ==  payload.email).first()
+    if user:
+        raise HTTPException(status_code=403, detail="User already exists.")
+    # create user 
+    message, is_valid = helpers.email_is_valid(payload.email)
+    if payload.password == payload.confirm_password:
+        if is_valid:
+            pw_hash=helpers.generate_password_hash(payload.password)
+            db_user = models.User(email=payload.email, 
+                                  password_hash=pw_hash,
+                                  user_id=helpers.uuid4(),
+                                  reset_id=helpers.uuid4(),
+                                  create_date=helpers.get_date())
+
+            db.add(db_user)
+            db.commit()
+            db.refresh(db_user)
+
+            # send email to confirm with a link
+            response=schemas.CreateUserResponse(message="Successfully created user; confirm user account via email.",
+                                                user_id=db_user.user_id)
+            return response
+        else:
+            raise HTTPException(status_code=401, detail=message)
+    else:
+        HTTPException(status_code=401, detail="Passwords do not match.")
+
 @app.post("/api/user/login", 
     responses={
         200: {"model": schemas.LoginResponse},
@@ -216,36 +266,126 @@ def login(payload: schemas.LoginUser, db: Session = Depends(get_db)):
         pass
     else:
         raise HTTPException(status_code=401, detail="Invalid username or password")
-    access_token = helpers.create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    response=schemas.LoginResponse(access_token=access_token, token_type="bearer", expires=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    access_token = helpers.create_access_token(user.email, ALGORITHM, JWT_SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token = helpers.create_refresh_token(user.email, ALGORITHM, JWT_REFRESH_SECRET_KEY, REFRESH_TOKEN_EXPIRE_MINUTES)
+    response=schemas.LoginResponse(access_token=access_token, refresh_token=refresh_token, expires=datetime.datetime.utcnow()+timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return response
 
-# @app.get("/api/protected",
-#     responses={
-#         200: {"model": schemas.LoginResponse},
-#         401: {
-#             "model": schemas.HTTPError,
-#             "description": "Incorrect password for user",
-#         },
-#         404: {
-#             "model": schemas.HTTPError,
-#             "description": "User does not exist",
-#         },
-#     }, 
-#     tags=["users"], 
-#     status_code=200)
-# def protected(credentials: HTTPAuthorizationCredentials = security):
-#     try:
-#         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
-#         username = payload.get("sub")
-#         user = db.query(models.User).filter(models.User.email ==  username).first()
-#         if not user:
-#             raise HTTPException(status_code=401, detail="Invalid token")
-#         return {"message": "Hello, {}! You accessed the protected route.".format(username)}
-#     except jwt.ExpiredSignatureError:
-#         raise HTTPException(status_code=401, detail="Token has expired")
-#     except (jwt.DecodeError, jwt.InvalidTokenError):
-#         raise HTTPException
+# jwt protected route
+@app.get("/api/user/details",
+    responses={
+        200: {"model": schemas.User},
+        401: {
+            "model": schemas.HTTPError,
+            "description": "Token expired",
+        },
+        403: {
+            "model": schemas.HTTPError,
+            "description": "Could not validate credential",
+        },
+        404: {
+            "model": schemas.HTTPError,
+            "description": "User not found",
+        },
+    }, 
+    tags=["users"], 
+    status_code=200)
+def get_user(token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+    token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
+    user = db.query(models.User).filter_by(email=token_payload['sub']).first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Could not find user",
+        )
+    
+    return user
+
+# session create
+@app.post("/api/session/create",
+    responses={
+        201: {"model": schemas.Session},
+        401: {
+            "model": schemas.HTTPError,
+            "description": "Token expired",
+        },
+        403: {
+            "model": schemas.HTTPError,
+            "description": "Could not validate credential",
+        },
+        404: {
+            "model": schemas.HTTPError,
+            "description": "User not found",
+        },
+    }, 
+    tags=["sessions"], 
+    status_code=201)
+def session_create(token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+    token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
+    user = db.query(models.User).filter_by(email=token_payload['sub']).first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Could not find user",
+        )
+    
+    session=models.Session(id=helpers.uuid4(),
+                            user_id=user.user_id,
+                            create_date=datetime.datetime.now())
+
+    db.add(session)
+    db.commit()
+    return schemas.Session(id=session.id, user_id=session.user_id, create_date=session.create_date)
+
+# session create
+@app.post("/api/session/query/create",
+    responses={
+        201: {"model": schemas.Query},
+        401: {
+            "model": schemas.HTTPError,
+            "description": "Token expired",
+        },
+        403: {
+            "model": schemas.HTTPError,
+            "description": "Could not validate credential",
+        },
+        404: {
+            "model": schemas.HTTPError,
+            "description": "User not found",
+        },
+    }, 
+    tags=["sessions"], 
+    status_code=201)
+def query_create(payload: schemas.CreateQuery, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+    token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
+    user = db.query(models.User).filter_by(email=token_payload['sub']).first()
+
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Could not find user",
+        )
+    
+    session=db.query(models.Session).filter_by(session_id=payload.session_id).first()
+
+    if session is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Could not find session",
+        )     
+
+    query=models.Query(id=helpers.uuid4(),
+                        session_id=payload.session_id,
+                        user_id=user.user_id,
+                        create_date=datetime.datetime.now(),
+                        bucket="queries")
+    db.add(query)
+    db.commit()
+
+    return schemas.Query(id=query.id, session_id=query.session_id, user_id=query.user_id, create_date=query.create_date, bucket=query.bucket)
+
 
 # main routes
     # api/audio/upload (minio /upload)

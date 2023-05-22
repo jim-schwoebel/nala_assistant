@@ -9,8 +9,8 @@ from uuid import UUID
 ################################################
 class User(BaseModel):
     id: UUID
-    user_id: str
-    reset_id: Union[str, None] = None
+    user_id: UUID
+    reset_id: UUID
     create_date: date
 
     # get information 
@@ -22,7 +22,7 @@ class User(BaseModel):
     first_name: Union[str, None] = None
     last_name: Union[str, None] = None
     language: Union[str, None] = 'en-us'
-    last_update: date
+    last_update: Union[date, None] = None
     
     class Config:
         orm_mode = True
@@ -104,9 +104,13 @@ class LoginUser(BaseModel):
 # create api keys
 class LoginResponse(BaseModel):
     access_token: str
-    token_type: str
+    refresh_token: str
     expires: date
 
 # token for requests
 class ApiToken(BaseModel):
     token_id: str
+
+# token for requests
+class CreateQuery(BaseModel):
+    session_id: str
