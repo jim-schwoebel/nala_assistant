@@ -384,6 +384,22 @@ def query_sample_create(payload: schemas.CreateQuery, file: UploadFile, token: s
     db.add(query)
     db.commit()
 
+    # save audio file to local storage
+
+    # operation - upload to s3 bucket (gcp)
+    # operation - transcribe audio file 
+
+    # if setting=openai_setting
+
+    # elif setting=bark_setting
+        # operation - send transcript to openAI API 
+        # operation - render bark audio file with agent model
+
+    # elif setting=action-setting 
+        # search actions, transcript = keyword 
+        # if keyword select response 
+        # render audio with microsoft TtS 
+
     return schemas.Query(id=query.id, session_id=query.session_id, user_id=query.user_id, create_date=query.create_date, bucket=query.bucket)
     
 # main routes
