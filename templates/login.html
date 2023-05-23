@@ -46,42 +46,8 @@ Forgot password? <a href='/reset'>reset it here.</a>
 </br>
 </br>
 </br>
-<div class='locationsection' style="display: None">
-  <label for="city" class="col-sm-2 col-form-label mbr-section-subtitle display-5">City</label>
-  <div class="col-sm-3">
-      <input class="form-control" id="city">
-  </div>
-  </br>
-  <label for="state" class="col-sm-2 col-form-label mbr-section-subtitle display-5">State</label>
-  <div class="col-sm-3">
-      <input class="form-control" id="state">
-  </div>
-  </br>
-  <label for="country" class="col-sm-2 col-form-label mbr-section-subtitle display-5">Country</label>
-  <div class="col-sm-3">
-      <input class="form-control" id="country">
-  </div>
-  </br>
-  <label for="ip" class="col-sm-2 col-form-label mbr-section-subtitle display-5">IP</label>
-  <div class="col-sm-3">
-      <input class="form-control" id="ip">
-  </div>
-  </br>
-  <label for="timezone" class="col-sm-2 col-form-label mbr-section-subtitle display-5">Timezone</label>
-  <div class="col-sm-3">
-      <input class="form-control" id="timezone">
-  </div>
-</div>
 
 <script>
-output=jQuery.get("http://ipinfo.io", function(response) {
-    document.getElementById("city").value = response.city
-    document.getElementById("state").value = response.region
-    document.getElementById("country").value = response.country
-    document.getElementById("ip").value = response.ip
-    document.getElementById("timezone").value = response.timezone
-}, "jsonp");
-
 // login function
 function loginUser() {
 
@@ -89,19 +55,14 @@ function loginUser() {
   password=document.getElementById('password').value
 
   let data = {"email": email,
-              "password": password,
-              "city": document.getElementById("city").value,
-              "state": document.getElementById("state").value,
-              "country": document.getElementById("country").value,
-              "ip_address": document.getElementById("ip").value,
-              "time_zone": document.getElementById("timezone").value};
+              "password": password};
 
   fetch("/api/user/login", {
     method: "POST",
     headers: {'Content-Type': 'application/json'}, 
     body: JSON.stringify(data)})
   .then((response) => response.json())
-  .then((data) => window.location.replace('/bark?token_id='+data.login_token+'&email='+email))
+  .then((data) => window.location.replace("/bark?access_token="+data.access_token+"&email="+email+"&refresh_token="+data.refresh_token))
 };
 
 // redirect to home page
