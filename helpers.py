@@ -104,17 +104,19 @@ def is_valid_uuid(uuid_to_test, version=4):
         return False
     return str(uuid_obj) == uuid_to_test
 
+def str_to_uuid(uuid_str):
+    return uuid.UUID(uuid_str)
 
 # Helper functions
-def create_access_token(subject: Union[str, Any], ALGORITHM: str, JWT_SECRET_KEY: str, minutes: int = None) -> str:
+def create_access_token(user_id: str, session_id: str, subject: Union[str, Any], ALGORITHM: str, JWT_SECRET_KEY: str, minutes: int = None) -> str:
     expires = datetime.datetime.utcnow() + timedelta(minutes=minutes)
-    to_encode = {"exp": expires, "sub": str(subject)}
+    to_encode = {"exp": expires, "sub": str(subject), "user_id": user_id, "session_id": session_id}
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, ALGORITHM)
     return encoded_jwt
 
-def create_refresh_token(subject: Union[str, Any], ALGORITHM: str, JWT_REFRESH_SECRET_KEY: str, minutes: int = None) -> str:
+def create_refresh_token(user_id: str, session_id: str, subject: Union[str, Any], ALGORITHM: str, JWT_REFRESH_SECRET_KEY: str, minutes: int = None) -> str:
     expires = datetime.datetime.utcnow() + timedelta(minutes=minutes)
-    to_encode = {"exp": expires, "sub": str(subject)}
+    to_encode = {"exp": expires, "sub": str(subject),"user_id": user_id, "session_id": session_id}
     encoded_jwt = jwt.encode(to_encode, JWT_REFRESH_SECRET_KEY, ALGORITHM)
     return encoded_jwt
 

@@ -9,7 +9,6 @@ from uuid import UUID
 ##              DATABASE SCHEMAS              ##
 ################################################
 class User(BaseModel):
-    id: UUID
     user_id: UUID
     reset_id: UUID
     create_date: date
@@ -29,15 +28,16 @@ class User(BaseModel):
         orm_mode = True
 
 class Session(BaseModel):
-    id: UUID
+    session_id: UUID
     user_id: UUID
     create_date: date
     class Config:
         orm_mode = True
 
 class Query(BaseModel):
-    id: UUID
+    query_id: UUID
     session_id: UUID
+    user_id: UUID
     create_date: date
     transcript: Union[str, None] = None
     bucket: str
@@ -45,7 +45,7 @@ class Query(BaseModel):
         orm_mode = True
 
 class Query_Operation(BaseModel):
-    id: UUID
+    query_operation_id: UUID
     reference_query: UUID
     create_date: date
     name: Union[str, None] = None
@@ -54,7 +54,7 @@ class Query_Operation(BaseModel):
         orm_mode = True
 
 class Action(BaseModel):
-    id: UUID
+    query_action_id: UUID
     reference_query: UUID
     create_date: date
     name: Union[str, None] = None
@@ -64,7 +64,7 @@ class Action(BaseModel):
         orm_mode = True
 
 class Integration(BaseModel):
-    id: UUID
+    integration_id: UUID
     create_date: date
     name: Union[str, None] = None
     credentials: Union[str, None] = None
@@ -96,7 +96,7 @@ class CreateUser(BaseModel):
 
 class CreateUserResponse(BaseModel):
     message: str
-    user_id: str
+    user_id: UUID
 
 class LoginUser(BaseModel):
     username: str
@@ -111,10 +111,6 @@ class LoginResponse(BaseModel):
 class ApiToken(BaseModel):
     token_id: str
 
-# token for requests
-class CreateQuery(BaseModel):
-    session_id: str
-
 class QueryRate(BaseModel):
-    query_id: str
+    query_id: UUID
     rating: int
