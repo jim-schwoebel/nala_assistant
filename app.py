@@ -356,8 +356,12 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 		shutil.copyfileobj(file.file, file_object) 
 
 	# transcribe audio file
-	transcript=helpers.audio_transcribe(filename)
+	transcript = helpers.audio_transcribe(filename)
 	query.transcript=transcript 
+
+	# featurize audio file query
+	features = helpers.audio_featurize(filename)
+	query.features=features
 
 	db.add(query)
 	db.commit()
@@ -365,6 +369,9 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 	# text response playback
 	text_response ='this is a response to' + transcript
 	helpers.tts_generate(text_response, 'response_'+filename)
+
+	# cleanup audio files from root directory
+	helpers.cleanup_audio()
 
 	# FUTURE
 	# ----------------
@@ -413,7 +420,6 @@ async def query_rate(payload: schemas.QueryRate, token: str = Depends(reuseable_
 			status_code=status.HTTP_404_NOT_FOUND,
 			detail="Could not find user",
 		)
-
 
 # @app.post("/api/session/query/inference",
 #     responses={

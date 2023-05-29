@@ -9,7 +9,7 @@ import uuid, datetime, secrets, os, requests, simplejson, smtplib, json, validat
 from sqlalchemy import desc
 from uuid import UUID
 import pandas as pd
-import datetime, jwt
+import datetime, jwt, shutil
 from datetime import timedelta 
 from typing import Union, Any
 
@@ -24,6 +24,12 @@ import os, json, datetime
 from datasets import load_dataset
 import torch
 from datasets import load_dataset
+
+import numpy as np 
+from python_speech_features import mfcc
+from python_speech_features import logfbank
+from python_speech_features import ssc
+import scipy.io.wavfile as wav
 
 # load model and processor into memory
 processor = WhisperProcessor.from_pretrained("openai/whisper-medium")
@@ -150,15 +156,18 @@ def audio_transcribe(audio_file: str, model=model, processor=processor):
     model.config.forced_decoder_ids = None
     
     # create temporary audio file
-    temp_audiofile='temp_'+audio_file
-    os.system('ffmpeg -y -i %s -ac 1 -ar 16000 %s'%(audio_file, temp_audiofile))
+    temp_audio_file='temp_'+audio_file
+    os.system('ffmpeg -y -i %s -ac 1 -ar 16000 %s'%(audio_file, temp_audio_file))
+
+    # keep temp file (16000 Hz mono)
+    os.remove(audio_file)
+    os.rename(temp_audio_file, audio_file)
 
     # read contents of temporary audio file
-    audio_input, samplerate = sf.read(temp_audiofile)
+    audio_input, samplerate = sf.read(audio_file)
     audio_duration=len(audio_input)/samplerate
 
     # remove temporary audio file
-    os.remove(temp_audiofile)
     input_features = processor(audio_input, sampling_rate=samplerate, return_tensors="pt").input_features 
 
     # master operation json schema
@@ -170,6 +179,81 @@ def audio_transcribe(audio_file: str, model=model, processor=processor):
     transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
 
     return transcription
+
+def get_labels(vector, label, label2):
+    sample_list=list()
+    for i in range(len(vector)):
+        sample_list.append(label+str(i+1)+'_'+label2)
+
+    return sample_list
+    
+def audio_featurize(file: str):
+    # from https://github.com/jim-schwoebel/allie/blob/master/features/audio_features/pspeech_features.py
+    (rate,sig) = wav.read(file)
+    mfcc_feat = mfcc(sig,rate)
+    fbank_feat = logfbank(sig,rate)
+    ssc_feat=ssc(sig, rate)
+
+    one_=np.mean(mfcc_feat, axis=0)
+    one=get_labels(one_, 'mfcc_', 'means')
+    two_=np.std(mfcc_feat, axis=0)
+    two=get_labels(one_, 'mfcc_', 'stds')
+    three_=np.amax(mfcc_feat, axis=0)
+    three=get_labels(one_, 'mfcc_', 'max')
+    four_=np.amin(mfcc_feat, axis=0)
+    four=get_labels(one_, 'mfcc_', 'min')
+    five_=np.median(mfcc_feat, axis=0)
+    five=get_labels(one_, 'mfcc_', 'medians')
+
+    six_=np.mean(fbank_feat, axis=0)
+    six=get_labels(six_, 'fbank_', 'means')
+    seven_=np.mean(fbank_feat, axis=0)
+    seven=get_labels(six_, 'fbank_', 'stds')
+    eight_=np.mean(fbank_feat, axis=0)
+    eight=get_labels(six_, 'fbank_', 'max')
+    nine_=np.mean(fbank_feat, axis=0)
+    nine=get_labels(six_, 'fbank_', 'min')
+    ten_=np.mean(fbank_feat, axis=0)
+    ten=get_labels(six_, 'fbank_', 'medians')
+
+    eleven_=np.mean(ssc_feat, axis=0)
+    eleven=get_labels(eleven_, 'spectral_centroid_', 'means')
+    twelve_=np.mean(ssc_feat, axis=0)
+    twelve=get_labels(eleven_, 'spectral_centroid_', 'stds')
+    thirteen_=np.mean(ssc_feat, axis=0)
+    thirteen=get_labels(eleven_, 'spectral_centroid_', 'max')
+    fourteen_=np.mean(ssc_feat, axis=0)
+    fourteen=get_labels(eleven_, 'spectral_centroid_', 'min')
+    fifteen_=np.mean(ssc_feat, axis=0)
+    fifteen=get_labels(eleven_, 'spectral_centroid_', 'medians')
+
+    labels=one+two+three+four+five+six+seven+eight+nine+ten+eleven+twelve+thirteen+fourteen+fifteen
+    features=np.append(one_,two_)
+    features=np.append(features, three_)
+    features=np.append(features, four_)
+    features=np.append(features, five_)
+    features=np.append(features, six_)
+    features=np.append(features, seven_)
+    features=np.append(features, eight_)
+    features=np.append(features, nine_)
+    features=np.append(features, ten_)
+    features=np.append(features, eleven_)
+    features=np.append(features, twelve_)
+    features=np.append(features, thirteen_)
+    features=np.append(features, fourteen_)
+    features=np.append(features, fifteen_)
+
+    return json.dumps(dict(zip(labels,features)))
+    
+def cleanup_audio():
+    '''
+    take in audio files and move them all into the 'queries' folder after a query.
+    '''
+    listdir=os.listdir()
+    curdir=os.getcwd()
+    for file in listdir:
+        if file.endswith('.wav'):
+            shutil.move(curdir+'/'+file, curdir+'/queries/'+file)
 
 ########################################
 ##       Main back-end functions      ##

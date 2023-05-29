@@ -39,6 +39,7 @@ class Query(BaseModel):
     session_id: UUID
     user_id: UUID
     create_date: date
+    features: Union[str, None] = None
     transcript: Union[str, None] = None
     bucket: str
     class Config:

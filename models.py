@@ -46,6 +46,7 @@ class Query(Base):
 	session_id=Column(UUIDType(binary=False))
 	user_id=Column(UUIDType(binary=False))
 	create_date = Column(DateTime)
+	features = Column(String(1028))
 	transcript = Column(String(128))
 	bucket = Column(String(128))
 
