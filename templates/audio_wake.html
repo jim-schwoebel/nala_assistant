@@ -10,7 +10,7 @@
       <div class="col">
         <div id='description'><h4><em>Start by clicking the <strong>grant mic access</strong> button</em></h4></div>
         <hr></hr>
-        <div class="d-flex flex-column align-items-center mt-4">
+        <div id='button-region' class="d-flex flex-column align-items-center mt-4">
           <button id="recordBtn" class="btn btn-danger-outline" onclick="chBackcolor('lightgray');"><i class="bi bi-mic"></i> Grant mic access</button>
           <button id="stopBtn" class="btn btn-black-outline" disabled><i class="bi bi-stop-circle"></i> Stop</button> 
           <button id="playBtn" class="btn btn-black-outline" disabled><i class="bi bi-play-circle"></i> Play</button>
@@ -221,6 +221,10 @@ function playChime() {
 
 // Function to send an HTTP POST request with JWT authorization
 function sendAudioRequestWithJWT(audioBlob) {
+  // Add loading icon
+  var description = document.getElementById('description');
+  description.innerHTML = "<em><h4>Loading...</h4></em>"
+
   // Create a new FormData object
   const formData = new FormData();
 
@@ -241,6 +245,8 @@ function sendAudioRequestWithJWT(audioBlob) {
   .then(blob => {
     // Use the blob as needed, for example, create an audio element and play it
     // const audioElement = new Audio(URL.createObjectURL(blob));
+    description.innerHTML = "<em><h4>now say <strong>hey nala</strong> to query</h4></em>"
+    // load audio and play it
     waveform.loadBlob(blob);
     waveform.on('ready', function () {
       waveform.play();

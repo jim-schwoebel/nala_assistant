@@ -327,6 +327,7 @@ def get_user(token: str = Depends(reuseable_oauth), db: Session = Depends(get_db
 def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
 	token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
 	user = db.query(models.User).filter_by(user_id=helpers.str_to_uuid(token_payload['user_id'])).first()
+	current_directory = os.getcwd()
 
 	print(token_payload)
 	print(user)
@@ -386,8 +387,7 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 		# render audio with microsoft TtS 
 	# ----------------
 
-	return FileResponse('response_'+filename, media_type="audio/mpeg")
-
+	return FileResponse(current_directory+"/queries/response_"+filename, media_type="audio/mpeg")
 
 @app.post("/api/session/query/rate",
 	responses={
