@@ -4,6 +4,7 @@ from pydantic import BaseModel, Json
 from typing import Union, List
 from uuid import UUID
 
+
 ################################################
 ##              DATABASE SCHEMAS              ##
 ################################################
@@ -98,14 +99,13 @@ class CreateUserResponse(BaseModel):
     user_id: str
 
 class LoginUser(BaseModel):
-    email: str
+    username: str
     password: str
 
 # create api keys
 class LoginResponse(BaseModel):
     access_token: str
     refresh_token: str
-    expires: date
 
 # token for requests
 class ApiToken(BaseModel):
@@ -114,3 +114,7 @@ class ApiToken(BaseModel):
 # token for requests
 class CreateQuery(BaseModel):
     session_id: str
+
+class QueryRate(BaseModel):
+    query_id: str
+    rating: int

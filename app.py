@@ -10,11 +10,13 @@ on top of the Bark AI model.
 import os, datetime, time, json, io, pandas, uvicorn, random, jwt
 from typing import List
 from fastapi import Depends, FastAPI, HTTPException, Request, status, File, UploadFile
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.openapi.models import OAuthFlows
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from passlib.context import CryptContext
@@ -24,7 +26,6 @@ from sqlalchemy import asc, desc, or_
 from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 from datetime import timedelta
-
 
 # minio
 from minio import Minio
@@ -60,7 +61,9 @@ app = FastAPI(
     version="0.0.2",
     terms_of_service="http://example.com/terms/",
     contact={"url": "https://barkassistant.com"},
-    openapi_tags=tags_metadata)
+    openapi_tags=tags_metadata,
+    bearer_scheme = {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"},
+    oauth_flows = OAuthFlows(bearerFormat="JWT"))
 
 app.add_middleware(SessionMiddleware, secret_key=os.getenv('SESSION_SECRET'))
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -86,24 +89,24 @@ def get_db():
 # app.add_middleware(HTTPSRedirectMiddleware)
 
 # setup minio instance
-minio_client = Minio(
-    "your-minio-url",
-    access_key="your-access-key",
-    secret_key="your-secret-key",
-    secure=False  # Set to True if your Minio server uses HTTPS
-)
+# minio_client = Minio(
+#     "your-minio-url",
+#     access_key="your-access-key",
+#     secret_key="your-secret-key",
+#     secure=False  # Set to True if your Minio server uses HTTPS
+# )
 
 # setup auth0 instance
-oauth = OAuth()
-auth0 = oauth.register(
-    'auth0',
-    client_id='YOUR_AUTH0_CLIENT_ID',
-    client_secret='YOUR_AUTH0_CLIENT_SECRET',
-    api_base_url='https://YOUR_AUTH0_DOMAIN',
-    access_token_url='https://YOUR_AUTH0_DOMAIN/oauth/token',
-    authorize_url='https://YOUR_AUTH0_DOMAIN/authorize',
-    client_kwargs={'scope': 'openid profile email'}
-)
+# oauth = OAuth()
+# auth0 = oauth.register(
+#     'auth0',
+#     client_id='YOUR_AUTH0_CLIENT_ID',
+#     client_secret='YOUR_AUTH0_CLIENT_SECRET',
+#     api_base_url='https://YOUR_AUTH0_DOMAIN',
+#     access_token_url='https://YOUR_AUTH0_DOMAIN/oauth/token',
+#     authorize_url='https://YOUR_AUTH0_DOMAIN/authorize',
+#     client_kwargs={'scope': 'openid profile email'}
+# )
 
 # JWT
 ACCESS_TOKEN_EXPIRE_MINUTES = 60  # 60 minutes
@@ -114,13 +117,9 @@ JWT_REFRESH_SECRET_KEY = os.environ['JWT_REFRESH_SECRET_KEY']
 
 # Auth
 reuseable_oauth = OAuth2PasswordBearer(
-    tokenUrl="/login",
+    tokenUrl="/api/user/login",
     scheme_name="JWT"
 )
-
-# Security
-security = HTTPBearer()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # front-end routes
 #############################
@@ -260,16 +259,22 @@ def register(payload: schemas.CreateUser, db: Session = Depends(get_db)):
     }, 
     tags=["users"], 
     status_code=200)
-def login(payload: schemas.LoginUser, db: Session = Depends(get_db)):
-    user=db.query(models.User).filter(models.User.email ==  payload.email).first()
-    if helpers.verify_password(user.password_hash, payload.password):
-        pass
+def login(payload: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user=db.query(models.User).filter(models.User.email ==  payload.username).first()
+    if user is None:
+        user = db.query(models.User).filter(models.User.email ==  payload.username).first()
+
+    if user:
+        if helpers.verify_password(user.password_hash, payload.password):
+            pass
+        else:
+            raise HTTPException(status_code=401, detail="Invalid username or password")
+        access_token = helpers.create_access_token(user.email, ALGORITHM, JWT_SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES)
+        refresh_token = helpers.create_refresh_token(user.email, ALGORITHM, JWT_REFRESH_SECRET_KEY, REFRESH_TOKEN_EXPIRE_MINUTES)
+        response=schemas.LoginResponse(access_token=access_token, refresh_token=refresh_token)
+        return response
     else:
-        raise HTTPException(status_code=401, detail="Invalid username or password")
-    access_token = helpers.create_access_token(user.email, ALGORITHM, JWT_SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES)
-    refresh_token = helpers.create_refresh_token(user.email, ALGORITHM, JWT_REFRESH_SECRET_KEY, REFRESH_TOKEN_EXPIRE_MINUTES)
-    response=schemas.LoginResponse(access_token=access_token, refresh_token=refresh_token, expires=datetime.datetime.utcnow()+timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
-    return response
+        raise HTTPException(status_code=403, detail="User does not exist.")
 
 # jwt protected route
 @app.get("/api/user/details",
@@ -339,26 +344,13 @@ def session_create(token: str = Depends(reuseable_oauth), db: Session = Depends(
     db.commit()
     return schemas.Session(id=session.id, user_id=session.user_id, create_date=session.create_date)
 
-# session create
-@app.post("/api/session/query/create",
-    responses={
-        201: {"model": schemas.Query},
-        401: {
-            "model": schemas.HTTPError,
-            "description": "Token expired",
-        },
-        403: {
-            "model": schemas.HTTPError,
-            "description": "Could not validate credential",
-        },
-        404: {
-            "model": schemas.HTTPError,
-            "description": "User not found",
-        },
-    }, 
-    tags=["sessions"], 
-    status_code=201)
-def query_sample_create(payload: schemas.CreateQuery, file: UploadFile, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+# session create -> respond with audio https://fastapi.tiangolo.com/advanced/custom-response/
+# following https://github.com/tiangolo/fastapi/issues/5278
+@app.post("/api/session/query/create", 
+          response_class=FileResponse,
+          status_code=201,
+          tags=["sessions"])
+async def query_sample_create(payload: schemas.CreateQuery, file: UploadFile, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
     token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
     user = db.query(models.User).filter_by(email=token_payload['sub']).first()
 
@@ -381,46 +373,102 @@ def query_sample_create(payload: schemas.CreateQuery, file: UploadFile, token: s
                         user_id=user.user_id,
                         create_date=datetime.datetime.now(),
                         bucket="queries")
+
+    # save audio file to local storage
+    filename=query.id + ".wav"
+    async with aiofiles.open(filename, 'wb') as out_file:
+        content = await file.read()  # async read
+        await out_file.write(content)  # async write
+
+    # transcribe audio file
+    transcript = 'this is a transcript'
+    query.transcript=transcript 
+
     db.add(query)
     db.commit()
 
-    # save audio file to local storage
+    # text response playback
+    text_response ='this is a response'
+    helpers.tts_generate(text_response, 'response_'+filename)
 
-    # operation - upload to s3 bucket (gcp)
-    # operation - transcribe audio file 
-
+    # FUTURE
+    # ----------------
+    # operation - upload to s3 bucket (gcp) - FUTURE 
     # if setting=openai_setting
-
     # elif setting=bark_setting
         # operation - send transcript to openAI API 
         # operation - render bark audio file with agent model
-
     # elif setting=action-setting 
         # search actions, transcript = keyword 
         # if keyword select response 
         # render audio with microsoft TtS 
+    # ----------------
 
-    return schemas.Query(id=query.id, session_id=query.session_id, user_id=query.user_id, create_date=query.create_date, bucket=query.bucket)
-    
-# main routes
-    # api/audio/upload (minio /upload)
-        # input
-            # audio file (blob)
-            # json (metadata)
-        # output 
-            # json, code (201)
+    return FileResponse("audio.mp3", media_type="audio/mpeg")
 
-	# /api/audio/transcribe (minio /transcribe)
-		# input
-			# audio file (blob)
-			# json (metadata)
-		# output 
-			# json, code (201)
 
-	# /api/audio/generate (minio /generate)
-		# input
-			# audio file (blob)
-			# json (metadata)
-		# output 
-			# audio file (blob)
-			# json (metadata), 201
+@app.post("/api/session/query/rate",
+    responses={
+        201: {"model": schemas.QueryRate},
+        401: {
+            "model": schemas.HTTPError,
+            "description": "Token expired",
+        },
+        403: {
+            "model": schemas.HTTPError,
+            "description": "Could not validate credential",
+        },
+        404: {
+            "model": schemas.HTTPError,
+            "description": "User not found",
+        },
+    }, 
+    tags=["sessions"], 
+    status_code=200)
+async def query_rate(payload: schemas.QueryRate, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+    # make sure it's the right user_id on token
+    query=db.query(models.Query).filter_by(query_id=payload.query_id).first()
+    if query:
+        query.rating = payload.rating 
+        db.commit()
+        response=schemas.QueryRate(query_id=payload.query_id, rating=payload.rating)
+        return response
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Could not find user",
+        )
+
+
+# @app.post("/api/session/query/inference",
+#     responses={
+#         200: {"model": schemas.QueryRate},
+#         401: {
+#             "model": schemas.HTTPError,
+#             "description": "Token expired",
+#         },
+#         403: {
+#             "model": schemas.HTTPError,
+#             "description": "Could not validate credential",
+#         },
+#         404: {
+#             "model": schemas.HTTPError,
+#             "description": "User not found",
+#         },
+#     }, 
+#     tags=["sessions"], 
+#     status_code=200)
+# async def query_inference(payload: schemas.QueryInference, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+#     # make sure it's the right user_id on token
+#     query=db.query(models.Query).filter_by(query_id=payload.query_id).first()
+#     if query:
+#         # take in transcribed text 
+#         # now model out the regression with scikit-learn or another framework
+#         response=schemas.QueryRate(query_id=payload.query_id, rating=payload.rating)
+#         return response
+#     else:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Could not find user",
+#         )
+

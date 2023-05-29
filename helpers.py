@@ -17,6 +17,26 @@ from typing import Union, Any
 import models
 from email_validator import validate_email, EmailNotValidError
 
+# from transformers import WhisperProcessor, WhisperForConditionalGeneration, SpeechT5Processor, SpeechT5ForTextToSpeech, SpeechT5HifiGan
+import numpy as np
+import soundfile as sf 
+import os, json, datetime
+from datasets import load_dataset
+import torch
+from datasets import load_dataset
+
+'''
+# load model and processor into memory
+processor = WhisperProcessor.from_pretrained("openai/whisper-medium")
+model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-medium")
+
+# speaker embeddings (loaded - so you don't need to do this each time)
+embeddings_dataset = load_dataset("Matthijs/cmu-arctic-xvectors", split="validation")
+speaker_embeddings = torch.tensor(embeddings_dataset[7306]["xvector"]).unsqueeze(0)
+tts_processor = SpeechT5Processor.from_pretrained("microsoft/speecht5_tts")
+tts_model = SpeechT5ForTextToSpeech.from_pretrained("microsoft/speecht5_tts")
+tts_vocoder = SpeechT5HifiGan.from_pretrained("microsoft/speecht5_hifigan")
+'''
 ########################################
 ##            DB Helpers              ##
 ########################################
@@ -116,17 +136,56 @@ def token_decode(token: str, JWT_SECRET_KEY: str, ALGORITHM: str):
 
     return payload
 
+'''
+## audio operations 
+def tts_generate(text: str, filename: str, speaker_embeddings=speaker_embeddings, processor=tts_processor, model=tts_model, vocoder=tts_vocoder):
+    # create tts prediction
+    inputs = processor(text=text, return_tensors="pt")
+    speech = model.generate_speech(inputs["input_ids"], speaker_embeddings, vocoder=vocoder)
+    sf.write(filename, speech.numpy(), samplerate=16000)
+    return filename
+
+
+def audio_transcribe(audio_file: str, model=model, processor=processor):
+    # set model configuration
+    model.config.forced_decoder_ids = None
+    
+    # create temporary audio file
+    temp_audiofile='temp_'+audio_file
+    os.system('ffmpeg -y -i %s -ac 1 -ar 16000 %s'%(audio_file, temp_audiofile))
+
+    # read contents of temporary audio file
+    audio_input, samplerate = sf.read(temp_audiofile)
+    audio_duration=len(audio_input)/samplerate
+
+    # remove temporary audio file
+    os.remove(temp_audiofile)
+    input_features = processor(audio_input, sampling_rate=samplerate, return_tensors="pt").input_features 
+
+    # master operation json schema
+    now_=datetime.datetime.now()
+    transcription=''
+    # generate token ids
+    predicted_ids = model.generate(input_features)
+    # decode token ids to text
+    transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)
+
+    return transcription
+'''
 ########################################
 ##       Main back-end functions      ##
 ########################################
-def transcribe_audio(audio_file) -> str:
+def send_email(to_: str, from_: str, subject: str):
+    return subject
+
+def transcribe_audio(audio_file: str) -> str:
     transcript=''
     return transcript 
 
-def query_chatgpt4(audio_file) -> str:
+def query_chatgpt4(audio_file: str) -> str:
     query=''
     return query
 
-def query_bark(transcript) -> str:
+def query_bark(transcript: str) -> str:
     query=''
     return query

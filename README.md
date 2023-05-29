@@ -1,6 +1,20 @@
 # bark_assistant
 bark assistant - some thoughts on how to make the Bark model into a voice assistant.
 
+## getting started
+`
+git clone ../bark_assistnat
+cd bark_assistant
+pip3 install -r requirements.txt
+uvicorn app:app --reload
+`
+
+You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appication.
+
+## deploying to server
+1. get a cloudflare account.
+2. setup app on a cloud provider 
+
 ## tools used
 - [minio](https://github.com/minio/minio) - minio is an object storage platform
 - [auth0](https://github.com/auth0) - authentication

@@ -1,0 +1,13 @@
+Onboarding process 
+- email confirmation (to send you emails)
+- gps location (precise) to allow for location searching
+- 'hey nala' x3 (for voice printing)
+- quick overview of things that you like (personalization) 
+
+list of some actions
+- nearby restaurant 
+- nearby bar 
+- nearby coffee shop 
+- nearby workout facility 
+- meetup / events
+

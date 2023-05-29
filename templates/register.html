@@ -69,13 +69,13 @@ function registerUser() {
 
     let confirm = {"email": email}
     console.log(data);
-    fetch("/api/user/create", {
+    fetch("/api/user/register", {
       method: "POST",
       headers: {'Content-Type': 'application/json'}, 
       body: JSON.stringify(data)
     }).then(res => {
       console.log("Response:", res);
-    }).then(fetch("/api/user/confirm/email", {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(confirm)})).then(function() {window.location = "/confirm_email";})
+    }).then(function() {window.location = "/login";})
 
   } else if (validateEmail(email) === false) {
     Swal.fire({icon: "error",
