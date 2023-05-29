@@ -2,13 +2,13 @@
 bark assistant - some thoughts on how to make the Bark model into a voice assistant.
 
 ## getting started
-`
+```
 sudo apt-get install ffmpeg
 git clone git@github.com:jim-schwoebel/bark_assistant.git
 cd bark_assistant
 pip3 install -r requirements.txt
 uvicorn app:app --reload
-`
+```
 
 You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appication.
 
