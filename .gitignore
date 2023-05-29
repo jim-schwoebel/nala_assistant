@@ -1,3 +1,4 @@
 cert.pem
+sqlite.db
 private.pem
 .DS_Store
