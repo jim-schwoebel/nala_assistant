@@ -254,6 +254,36 @@ function sendAudioRequestWithJWT(audioBlob) {
     console.error('Error:', error);
   });
 }
+
+function browserDetect(){    
+  let userAgent = navigator.userAgent;
+  let browserName;
+
+  if(userAgent.match(/chrome|chromium|crios/i)){
+     browserName = "chrome";
+   } else if(userAgent.match(/firefox|fxios/i)){
+     browserName = "firefox";
+   } else if(userAgent.match(/safari/i)){
+     browserName = "safari";
+   }else if(userAgent.match(/opr\//i)){
+     browserName = "opera";
+   } else if(userAgent.match(/edg/i)){
+     browserName = "edge";
+   } else{
+     browserName="No browser detection";
+   }
+  
+  if(browserName != 'chrome') {
+    Swal.fire({icon: "error",
+                  title: "Chrome browser required.",
+                  text:  "You are using "+ browserName +" browser. This application only works with chrome-based browsers. Please login on a chrome browser to continue.",
+                  confirmButtonColor: '#2d80f9',
+                  confirmButtonText: 'close'}).then(function() {window.location = "/";});
+
+  };
+};
+
+browserDetect();
 </script>
 </center>
 </body>
