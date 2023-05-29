@@ -17,7 +17,7 @@ from typing import Union, Any
 import models
 from email_validator import validate_email, EmailNotValidError
 
-# from transformers import WhisperProcessor, WhisperForConditionalGeneration, SpeechT5Processor, SpeechT5ForTextToSpeech, SpeechT5HifiGan
+from transformers import WhisperProcessor, WhisperForConditionalGeneration, SpeechT5Processor, SpeechT5ForTextToSpeech, SpeechT5HifiGan
 import numpy as np
 import soundfile as sf 
 import os, json, datetime
@@ -25,7 +25,6 @@ from datasets import load_dataset
 import torch
 from datasets import load_dataset
 
-'''
 # load model and processor into memory
 processor = WhisperProcessor.from_pretrained("openai/whisper-medium")
 model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-medium")
@@ -36,7 +35,7 @@ speaker_embeddings = torch.tensor(embeddings_dataset[7306]["xvector"]).unsqueeze
 tts_processor = SpeechT5Processor.from_pretrained("microsoft/speecht5_tts")
 tts_model = SpeechT5ForTextToSpeech.from_pretrained("microsoft/speecht5_tts")
 tts_vocoder = SpeechT5HifiGan.from_pretrained("microsoft/speecht5_hifigan")
-'''
+
 ########################################
 ##            DB Helpers              ##
 ########################################
@@ -138,7 +137,6 @@ def token_decode(token: str, JWT_SECRET_KEY: str, ALGORITHM: str):
 
     return payload
 
-'''
 ## audio operations 
 def tts_generate(text: str, filename: str, speaker_embeddings=speaker_embeddings, processor=tts_processor, model=tts_model, vocoder=tts_vocoder):
     # create tts prediction
@@ -146,7 +144,6 @@ def tts_generate(text: str, filename: str, speaker_embeddings=speaker_embeddings
     speech = model.generate_speech(inputs["input_ids"], speaker_embeddings, vocoder=vocoder)
     sf.write(filename, speech.numpy(), samplerate=16000)
     return filename
-
 
 def audio_transcribe(audio_file: str, model=model, processor=processor):
     # set model configuration
@@ -170,10 +167,10 @@ def audio_transcribe(audio_file: str, model=model, processor=processor):
     # generate token ids
     predicted_ids = model.generate(input_features)
     # decode token ids to text
-    transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)
+    transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
 
     return transcription
-'''
+
 ########################################
 ##       Main back-end functions      ##
 ########################################

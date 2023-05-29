@@ -7,7 +7,7 @@ Demonstrating a first-in-kind implementation of voice assistants
 on top of the Bark AI model.
 '''
 
-import os, datetime, time, json, io, pandas, uvicorn, random, jwt, uuid
+import os, datetime, time, json, io, pandas, uvicorn, random, jwt, uuid, shutil
 from typing import List
 from fastapi import Depends, FastAPI, HTTPException, Request, status, File, UploadFile
 from fastapi.responses import HTMLResponse, FileResponse
@@ -185,7 +185,6 @@ def reset(request: Request, db: Session = Depends(get_db)):
 	return templates.TemplateResponse("reset.html", {"request": request})
 
 # /bark
-	# stream
 @app.get("/bark", response_class=HTMLResponse, 
 				  tags=["templates"], 
 				  status_code=200, 
@@ -353,21 +352,19 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 
 	# save audio file to local storage
 	filename=query.query_id + ".wav"
-
-	# async with aiofiles.open(filename, 'wb') as out_file:
-	#     content = await file.read()  # async read
-	#     await out_file.write(content)  # async write
+	with open(filename, "wb+") as file_object:
+		shutil.copyfileobj(file.file, file_object) 
 
 	# transcribe audio file
-	transcript = 'this is a transcript'
+	transcript=helpers.audio_transcribe(filename)
 	query.transcript=transcript 
 
 	db.add(query)
 	db.commit()
 
 	# text response playback
-	text_response ='this is a response'
-	# helpers.tts_generate(text_response, 'response_'+filename)
+	text_response ='this is a response to' + transcript
+	helpers.tts_generate(text_response, 'response_'+filename)
 
 	# FUTURE
 	# ----------------
@@ -382,7 +379,7 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 		# render audio with microsoft TtS 
 	# ----------------
 
-	return FileResponse("bell.mp3", media_type="audio/mpeg")
+	return FileResponse('response_'+filename, media_type="audio/mpeg")
 
 
 @app.post("/api/session/query/rate",

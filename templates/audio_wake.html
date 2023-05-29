@@ -243,8 +243,12 @@ function sendAudioRequestWithJWT(audioBlob) {
     // const audioElement = new Audio(URL.createObjectURL(blob));
     waveform.loadBlob(blob);
     waveform.on('ready', function () {
-        waveform.play();
+      waveform.play();
     });
+    detectWakeword();
+    // waveform.on('finish', function () {
+    //   location.reload();
+    // });
   })
   .catch(error => {
     console.error('Error:', error);

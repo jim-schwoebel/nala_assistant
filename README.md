@@ -3,7 +3,8 @@ bark assistant - some thoughts on how to make the Bark model into a voice assist
 
 ## getting started
 `
-git clone ../bark_assistnat
+sudo apt-get install ffmpeg
+git clone git@github.com:jim-schwoebel/bark_assistant.git
 cd bark_assistant
 pip3 install -r requirements.txt
 uvicorn app:app --reload
