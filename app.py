@@ -190,12 +190,14 @@ def reset(request: Request, db: Session = Depends(get_db)):
 				  tags=["templates"], 
 				  status_code=200, 
 				  include_in_schema=False)
-def bark_assistant(request: Request, db: Session = Depends(get_db)):
+def bark_assistant(access_token: str, refresh_token: str, request: Request, db: Session = Depends(get_db)):
 	'''
 		Home page.
 	'''
 	request.session["base_url"] = "/"
 	request.session['nowtime'] = datetime.datetime.now().year
+	request.session["access_token"] = access_token
+	request.session["refresh_token"] = refresh_token
 	return templates.TemplateResponse("audio_wake.html", {"request": request})
 
 # /docs 
@@ -236,9 +238,6 @@ def register(payload: schemas.CreateUser, db: Session = Depends(get_db)):
 			db.add(db_user)
 			db.commit()
 			db.refresh(db_user)
-
-			# now pull new user 
-			print(db_user.user_id)
 
 			# send email to confirm with a link
 			response=schemas.CreateUserResponse(message="Successfully created user; confirm user account via email.",
@@ -329,9 +328,10 @@ def get_user(token: str = Depends(reuseable_oauth), db: Session = Depends(get_db
 def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
 	token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
 	user = db.query(models.User).filter_by(user_id=helpers.str_to_uuid(token_payload['user_id'])).first()
+
 	print(token_payload)
-	print(helpers.str_to_uuid(token_payload['user_id']))
 	print(user)
+	
 	if user is None:
 		raise HTTPException(
 			status_code=status.HTTP_404_NOT_FOUND,
@@ -339,14 +339,12 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 		)
 
 	session=db.query(models.Session).filter_by(session_id=helpers.str_to_uuid(token_payload['session_id']), user_id=user.user_id).first()
-	print(session)
 	if session is None:
 		raise HTTPException(
 			status_code=status.HTTP_404_NOT_FOUND,
 			detail="Could not find session for given user",
 		)     
 
-	print(token_payload)
 	query=models.Query(query_id=helpers.uuid4(),
 						session_id=helpers.str_to_uuid(token_payload['session_id']),
 						user_id=helpers.str_to_uuid(token_payload['user_id']),
@@ -354,7 +352,7 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 						bucket="queries")
 
 	# save audio file to local storage
-	filename=query.id + ".wav"
+	filename=query.query_id + ".wav"
 
 	# async with aiofiles.open(filename, 'wb') as out_file:
 	#     content = await file.read()  # async read
@@ -369,7 +367,7 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 
 	# text response playback
 	text_response ='this is a response'
-	helpers.tts_generate(text_response, 'response_'+filename)
+	# helpers.tts_generate(text_response, 'response_'+filename)
 
 	# FUTURE
 	# ----------------
@@ -384,7 +382,7 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 		# render audio with microsoft TtS 
 	# ----------------
 
-	return FileResponse("audio.mp3", media_type="audio/mpeg")
+	return FileResponse("bell.mp3", media_type="audio/mpeg")
 
 
 @app.post("/api/session/query/rate",

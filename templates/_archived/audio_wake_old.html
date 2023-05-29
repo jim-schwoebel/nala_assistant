@@ -90,7 +90,7 @@ function stopRecording() {
 }
 
 // Play recorded audio
-async function playAudio() {
+function playAudio() {
   // var audioElement = document.getElementById('audioPlayer');
   // audioElement.src = URL.createObjectURL(audioBlob);
   // audioElement.play();
@@ -104,7 +104,10 @@ async function playAudio() {
     height: 200,
     responsive: true
   });
-  sendAudioRequestWithJWT(audioBlob);
+  waveform.loadBlob(audioBlob);
+  waveform.on('ready', function () {
+      waveform.play();
+  });
 }
 
 // Create waveform using Wavesurfer.js
@@ -218,38 +221,6 @@ var sound = new Howl({
 function playChime() {
     sound.play();
 };
-
-// Function to send an HTTP POST request with JWT authorization
-function sendAudioRequestWithJWT(audioBlob) {
-  // Create a new FormData object
-  const formData = new FormData();
-
-  // Append your audio file to the FormData object
-  formData.append('file', audioBlob);
-
-  // Prepare the headers with the JWT token
-  const headers = new Headers();
-  headers.append('Authorization', 'Bearer ' + "{{request.session.get('access_token')}}");
-
-  // Send the POST request to your server with the JWT token
-  fetch('/api/session/query/create', {
-    method: 'POST',
-    headers: headers,
-    body: formData
-  })
-  .then(response => response.blob()) // Convert the response to a Blob
-  .then(blob => {
-    // Use the blob as needed, for example, create an audio element and play it
-    // const audioElement = new Audio(URL.createObjectURL(blob));
-    waveform.loadBlob(blob);
-    waveform.on('ready', function () {
-        waveform.play();
-    });
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-}
 </script>
 </center>
 </body>

@@ -49,21 +49,33 @@ Forgot password? <a href='/reset'>reset it here.</a>
 
 <script>
 // login function
+
 function loginUser() {
+  const formData = new FormData();
+  formData.append('username', document.getElementById('email').value);
+  formData.append('password', document.getElementById('password').value);
 
-  email=document.getElementById('email').value
-  password=document.getElementById('password').value
-
-  let data = {"email": email,
-              "password": password};
-
-  fetch("/api/user/login", {
-    method: "POST",
-    headers: {'Content-Type': 'application/json'}, 
-    body: JSON.stringify(data)})
-  .then((response) => response.json())
-  .then((data) => window.location.replace("/bark?access_token="+data.access_token+"&email="+email+"&refresh_token="+data.refresh_token))
-};
+  fetch('/api/user/login', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error('Login failed');
+    }
+  })
+  .then(data => {
+    console.log(data.message); // Display success message
+    // Perform further actions after successful login
+    window.location.replace("/bark?access_token="+data.access_token+"&email="+data.sub+"&refresh_token="+data.refresh_token)
+  })
+  .catch(error => {
+    console.error(error.message); // Display error message
+    // Perform actions for failed login
+  });
+}
 
 // redirect to home page
 </script>
