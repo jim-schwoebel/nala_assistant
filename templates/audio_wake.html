@@ -4,29 +4,7 @@
 <center>
   <title>🦁 Nala</title>
 </head>
-<body>
-  <div class="container mt-5">
-    <div class="row">
-      <div class="col">
-        <div id='description'><h4><em>Start by clicking the <strong>grant mic access</strong> button</em></h4></div>
-        <hr></hr>
-        <div id='button-region' class="d-flex flex-column align-items-center mt-4">
-          <button id="recordBtn" class="btn btn-danger-outline" onclick="chBackcolor('lightgray');"><i class="bi bi-mic"></i> Grant mic access</button>
-          <button id="stopBtn" class="btn btn-black-outline" disabled><i class="bi bi-stop-circle"></i> Stop</button> 
-          <button id="playBtn" class="btn btn-black-outline" disabled><i class="bi bi-play-circle"></i> Play</button>
-        </div>
-      </div>
-    </div>
-    <div class="row mt-5">
-      <div class="col">
-        <div id="waveform"></div>
-      </div>
-    </div>
-  </div>
-
-  <audio id="audioPlayer"></audio>
-
-<script>
+<script rel="preload">
 var audioContext;
 var mediaRecorder;
 var chunks = [];
@@ -114,6 +92,8 @@ function createWaveform() {
 
 // Wakeword detection
 function detectWakeword() {
+  resetBtns();
+  document.getElementById('rating-region').style.display = "none";
   document.getElementById('description').innerHTML = "<em><h4>now say <strong>hey nala</strong> to query</h4></em>"
   document.getElementById('recordBtn').style.display = "none";
   var recognition = new webkitSpeechRecognition();
@@ -223,7 +203,7 @@ function playChime() {
 function sendAudioRequestWithJWT(audioBlob) {
   // Add loading icon
   var description = document.getElementById('description');
-  description.innerHTML = "<em><h4>Loading...</h4></em>"
+  description.innerHTML = "<em><h4><div class='spinner-border' role='status'><span class='sr-only'>Loading...</span></div>&nsbp;Loading...</h4></em>"
 
   // Create a new FormData object
   const formData = new FormData();
@@ -251,13 +231,13 @@ function sendAudioRequestWithJWT(audioBlob) {
     waveform.on('ready', function () {
       waveform.play();
     });
-    detectWakeword();
-    // waveform.on('finish', function () {
-    //   location.reload();
-    // });
+    waveform.on('finish', function () { 
+      get_query_id();
+    });
   })
+  .then(detectWakeword)
   .catch(error => {
-    console.error('Error:', error);
+    console.error('Error:', error)
   });
 }
 
@@ -289,8 +269,116 @@ function browserDetect(){
   };
 };
 
+function resetBtns() {
+  var element = document.getElementById('thumbsdown');
+  element.classList.remove("btn-primary-outline")
+  element.classList.add("btn-black-outline");
+  var element = document.getElementById('thumbsup');
+  element.classList.remove("btn-primary-outline")
+  element.classList.add("btn-black-outline");
+};
+
+function get_query_id() {
+  const url = "/api/session/query/get";
+  const headers = new Headers();
+  headers.append('Authorization', 'Bearer ' + "{{request.session.get('access_token')}}");
+  data={};
+
+  // Send the data as JSON to the server
+  fetch(url, {
+    method: "GET",
+    headers: headers,
+  })
+  .then(function (response) {
+      // Handle the response from the server
+      if (response.ok) {
+        return response.json(); // Parse the response as JSON
+      } else {
+        throw new Error("Error: " + response.status);
+      }
+    })
+    .then(function (responseData) {
+      // Process the response data
+      console.log(responseData);
+      sessionStorage.setItem("query_id", responseData['query_id']);
+      sessionStorage.setItem("rating", responseData['rating']);
+      document.getElementById('rating-region').style.display = "block";
+    })
+    .catch(function (error) {
+      // Handle any errors that occurred during the request
+      console.error(error);
+    });
+};
+
+function rate_query(rating) {
+  const url = "/api/session/query/rate";
+  const headers = new Headers();
+  headers.append('Authorization', 'Bearer ' + "{{request.session.get('access_token')}}");
+  headers.append('Content-Type', 'application/json')
+  var data = {"query_id": sessionStorage.getItem("query_id"), "rating": parseInt(rating)}
+  // Send the data as JSON to the server
+  fetch(url, {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(data),
+  })
+  .then(function (response) {
+      // Handle the response from the server
+      if (response.ok) {
+        return response.json(); // Parse the response as JSON
+      } else {
+        throw new Error("Error: " + response.status);
+      }
+    })
+    .then(function (responseData) {
+      // Process the response data
+      console.log(responseData);
+      // change color
+      // if(rating == -1){
+      //   var element = document.getElementById('thumbsdown');
+      //   element.classList.remove("btn-black-outline");
+      //   element.classList.add("btn-primary-outline");
+      // } else {
+      //   var element = document.getElementById('thumbsup');
+      //   element.classList.remove("btn-black-outline");
+      //   element.classList.add("btn-primary-outline");
+      // };
+      document.getElementById('rating-region').style.display = "none";
+    })
+    .then(detectWakeword)
+    .catch(function (error) {
+      // Handle any errors that occurred during the request
+      console.error(error);
+    });
+};
+
 browserDetect();
 </script>
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col">
+        <div id='description'><h4><em>Start by clicking the <strong>grant mic access</strong> button</em></h4></div>
+        <hr></hr>
+          <div id='button-region' class="d-flex flex-column align-items-center mt-4">
+            <button id="recordBtn" class="btn btn-danger-outline" onclick="chBackcolor('lightgray');"><i class="bi bi-mic"></i> Grant mic access</button>
+            <button id="stopBtn" class="btn btn-black-outline" disabled><i class="bi bi-stop-circle"></i> Stop</button> 
+            <button id="playBtn" class="btn btn-black-outline" disabled><i class="bi bi-play-circle"></i> Play</button>
+          </div>
+        </div>
+      </div>
+    <div class="row mt-5">
+      <div class="col">
+        <div id="waveform"></div>
+          <div id='rating-region' style="display: none">
+            <button id='thumbsup' class="btn btn-black-outline" onclick="rate_query(1)"><i class="bi bi-hand-thumbs-up"></i>&nbsp;like</button>
+            <button id='thumbsdown' class="btn btn-black-outline" onclick="rate_query(-1)"><i class="bi bi-hand-thumbs-down"></i>&nbsp;dislike</button>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audioPlayer"></audio>
 </center>
 </body>
 </html>

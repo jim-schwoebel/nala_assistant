@@ -49,26 +49,9 @@ class Query(Base):
 	features = Column(String(1028))
 	transcript = Column(String(128))
 	bucket = Column(String(128))
-
-class Query_Operation(Base):
-	# query (hi.wav) -> transcribe (hi.wav / hi.json) -> bark_predict (hi.wav / hi.json)
-	# hi.json has k/v pair 
-	__tablename__ = 'query_operations'
-	query_operation_id = Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
-	create_date = Column(DateTime)
-	name = Column(String(128))
-	meta = Column(String(2048))
-	reference_query=  Column(UUIDType(binary=False))
-
-class Query_Action(Base):
-	__tablename__ = 'query_actions'
-	query_action_id = Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
-	create_date = Column(DateTime)
-	keyword = Column(String(128))
-	name = Column(String(128))
-	meta = Column(String(2048))
-	integration = Column(String(128))
-	reference_query = Column(UUIDType(binary=False))
+	rating = Column(Integer)
+	response = Column(String(1028))
+	response_method = Column(String(128))
 
 class Integration(Base):
 	__tablename__ = 'integrations'

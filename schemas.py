@@ -42,25 +42,9 @@ class Query(BaseModel):
     features: Union[str, None] = None
     transcript: Union[str, None] = None
     bucket: str
-    class Config:
-        orm_mode = True
-
-class Query_Operation(BaseModel):
-    query_operation_id: UUID
-    reference_query: UUID
-    create_date: date
-    name: Union[str, None] = None
-    meta: Union[str, None] = None
-    class Config:
-        orm_mode = True
-
-class Action(BaseModel):
-    query_action_id: UUID
-    reference_query: UUID
-    create_date: date
-    name: Union[str, None] = None
-    meta: Union[str, None] = None
-    integration: Union[str, None] = None
+    rating: Union[int, None] = None
+    response: Union[str, None] = None
+    response_method: Union[str, None] = None
     class Config:
         orm_mode = True
 
@@ -114,4 +98,8 @@ class ApiToken(BaseModel):
 
 class QueryRate(BaseModel):
     query_id: UUID
+    rating: Union[int, None]
+
+class QueryRateString(BaseModel):
+    query_id: str
     rating: int

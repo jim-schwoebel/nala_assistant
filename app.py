@@ -26,6 +26,7 @@ from sqlalchemy import asc, desc, or_
 from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 from datetime import timedelta
+from sqlalchemy import asc, desc, or_
 from uuid import UUID
 
 # minio
@@ -218,7 +219,7 @@ def bark_assistant(access_token: str, refresh_token: str, request: Request, db: 
 		},
 	}, 
 	tags=["users"], 
-	status_code=200)
+	status_code=201)
 def register(payload: schemas.CreateUser, db: Session = Depends(get_db)):
 	user=db.query(models.User).filter(models.User.email ==  payload.email).first()
 	if user:
@@ -364,12 +365,15 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 	features = helpers.audio_featurize(filename)
 	query.features=features
 
+	# get back query action response and store in system
+	text_response ='this is a response to' + transcript
+	query.response = text_response
+	query.response_method = 'test'
+	helpers.tts_generate(text_response, 'response_'+filename)
+
+	# store in database
 	db.add(query)
 	db.commit()
-
-	# text response playback
-	text_response ='this is a response to' + transcript
-	helpers.tts_generate(text_response, 'response_'+filename)
 
 	# cleanup audio files from root directory
 	helpers.cleanup_audio()
@@ -389,6 +393,38 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 
 	return FileResponse(current_directory+"/queries/response_"+filename, media_type="audio/mpeg")
 
+@app.get("/api/session/query/get",
+	responses={
+		200: {"model": schemas.QueryRate},
+		401: {
+			"model": schemas.HTTPError,
+			"description": "Token expired",
+		},
+		403: {
+			"model": schemas.HTTPError,
+			"description": "Could not validate credential",
+		},
+		404: {
+			"model": schemas.HTTPError,
+			"description": "User not found",
+		},
+	}, 
+	tags=["sessions"], 
+	status_code=200)
+def query_get_last(token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+	# make sure it's the right user_id on token
+	token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
+	user = db.query(models.User).filter_by(user_id=helpers.str_to_uuid(token_payload['user_id'])).first()
+	query=db.query(models.Query).filter_by(user_id=helpers.str_to_uuid(token_payload['user_id']), session_id=helpers.str_to_uuid(token_payload['session_id'])).order_by(models.Query.create_date.desc()).first()
+	if query:
+		response=schemas.QueryRate(query_id=query.query_id, rating=query.rating)
+		return response
+	else:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Could not find query",
+		)
+
 @app.post("/api/session/query/rate",
 	responses={
 		201: {"model": schemas.QueryRate},
@@ -407,13 +443,13 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 	}, 
 	tags=["sessions"], 
 	status_code=200)
-async def query_rate(payload: schemas.QueryRate, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+def query_rate(payload: schemas.QueryRateString, token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
 	# make sure it's the right user_id on token
-	query=db.query(models.Query).filter_by(query_id=payload.query_id).first()
+	query=db.query(models.Query).filter_by(query_id=helpers.str_to_uuid(payload.query_id)).first()
 	if query:
 		query.rating = payload.rating 
 		db.commit()
-		response=schemas.QueryRate(query_id=payload.query_id, rating=payload.rating)
+		response=schemas.QueryRate(query_id=helpers.str_to_uuid(payload.query_id), rating=payload.rating)
 		return response
 	else:
 		raise HTTPException(
@@ -421,6 +457,7 @@ async def query_rate(payload: schemas.QueryRate, token: str = Depends(reuseable_
 			detail="Could not find user",
 		)
 
+# if we make a ML model to predict relevancy 
 # @app.post("/api/session/query/inference",
 #     responses={
 #         200: {"model": schemas.QueryRate},
