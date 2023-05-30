@@ -48,7 +48,7 @@ You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appicat
 ## browser compatibility
 Currently, Nala works on Chrome and Safari-based browsers based on [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript) standards. If you load Nala on any other browser, it will give an error message like this.
 
-!()[https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/error.png]
+![https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/error.png]()
 
 ## future tools used
 - [minio](https://github.com/minio/minio) - minio is an object storage platform
