@@ -18,12 +18,31 @@ class User(BaseModel):
     password_hash: str
     is_confirmed: bool = False
 
-    # name information
+    # name/language
     first_name: Union[str, None] = None
     last_name: Union[str, None] = None
     language: Union[str, None] = 'en-us'
-    last_update: Union[date, None] = None
     
+    # personalized settings
+    last_update: Union[date, None] = None
+    last_email: Union[date, None] = None
+    last_login: Union[date, None] = None
+    last_login_city: Union[str, None] = None
+    last_login_state: Union[str, None] = None
+    last_login_country: Union[str, None] = None
+    last_login_ip: Union[str, None] = None
+    login_number: int
+    signup_ip: Union[str, None] = None
+    image_link: Union[str, None] = None
+    phone_number: Union[str, None] = None
+    gender: Union[str, None] = None
+    age: float
+
+    # assistant default settings
+    sound: Union[str, None] = None
+    voice: Union[str, None] = None
+    response_type: Union[str, None] = None
+
     class Config:
         orm_mode = True
 
@@ -45,6 +64,10 @@ class Query(BaseModel):
     rating: Union[int, None] = None
     response: Union[str, None] = None
     response_method: Union[str, None] = None
+    language: Union[str, None] = None
+    city: Union[str, None] = None
+    state: Union[str, None] = None
+    country: Union[str, None] = None
     class Config:
         orm_mode = True
 
@@ -103,3 +126,11 @@ class QueryRate(BaseModel):
 class QueryRateString(BaseModel):
     query_id: str
     rating: int
+
+class UpdateUser(BaseModel):
+    first: Union[str, None]
+    last: Union[str, None]
+    language: str = 'en-us'
+    sound: str
+    voice: str
+    response_type: str

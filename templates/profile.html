@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html  >
+{% include 'header.html' %}
+</br>
+</br>
+<center>
+<h1><strong>My Profile</strong></h1>
+</br>
+</br>
+Below is a bit more about settings in your profile. Feel free to change the profile settings and your voice assistant will change accordingly.
+</br>
+</br>
+<h3>email</h3>
+<input id='email' type="text" value="{{request.session.get('user')['email']}}" size="30" readonly></input>
+</br>
+</br>
+<h3>first name</h3>
+<input id='first' type="text" size="30" value="{{request.session.get('user')['first']}}"></input>
+</br>
+</br>
+<h3>last name</h3>
+<input id='last' type="text" size="30" value="{{request.session.get('user')['last']}}"></input>
+</br>
+</br>
+<h3>language</h3>
+<select id="language">
+{% for language in request.session.get('settings')['language']['options'] %}
+	{% if request.session.get('user')['language'] == language %}
+		<option selected>{{language}}</option>
+	{% else %}
+		<option>{{language}}</option>
+	{% endif %}
+{% endfor %}
+</select>
+</br>
+</br>
+<h3>prompt sound</h3>
+<select id="sound">
+{% for sound in request.session.get('settings')['sounds']['options'] %}
+	{% if request.session.get('user')['sound'] == sound %}
+	<option selected>{{sound}}</option>
+	{% else %}
+	<option>{{sound}}</option>
+	{% endif %}
+{% endfor %}
+</select>
+</br>
+</br>
+<h3>voice skin</h3>
+<select id="voice">
+{% for voice in request.session.get('settings')['voice']['options'] %}
+	{% if request.session.get('user')['voice'] == voice %}
+	<option selected>{{voice}}</option>
+	{% else %}
+	<option>{{voice}}</option>
+	{% endif %}
+{% endfor %}
+</select>
+</br>
+</br>
+<h3>response type</h3>
+<select id="response">
+{% for response_type in request.session.get('settings')['response_type']['options'] %}
+	{% if request.session.get('user')['response_type'] == response_type %}
+		<option selected>{{response_type}}</option>
+	{% else %}
+		<option>{{response_type}}</option>
+	{% endif %}
+{% endfor %}
+</select>
+</br>
+</br>
+</br>
+<button type=submit class="btn btn-secondary" id="toggle" onclick="edit_profile()"><strong><h3>Save</h3></strong></button>
+</br>
+</br>
+</div>
+</center>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+
+<script rel='preload'>
+// change settings
+// redirect to bark page
+function edit_profile() {
+  data={"first": document.getElementById("first").value,
+		"last": document.getElementById("last").value,
+		"language": document.getElementById("language").value,
+		"sound": document.getElementById("sound").value,
+		"voice": document.getElementById("voice").value,
+		"response_type": document.getElementById("response").value}
+
+  const headers = new Headers();
+  headers.append('Authorization', 'Bearer ' + "{{request.session.get('access_token')}}");
+  headers.append('Content-Type', 'application/json')
+
+  console.log(JSON.stringify(data));
+
+  fetch("/api/user/update", {
+            method: "PUT",
+            headers: headers,
+            body: JSON.stringify(data)})
+  .then((response) => response.json())
+  .then(window.location.replace("/bark?access_token={{request.session.get('access_token')}}&refresh_token={{request.session.get('refresh_token')}}"));
+}
+</script>
+
+</html>

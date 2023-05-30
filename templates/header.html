@@ -29,12 +29,19 @@
       <li class="nav-item">
         <a class="nav-link" href="/commands">Commands</a>
       </li> -->
+      {% if request.session.get('access_token') %}
       <li class="nav-item">
-        <a class="nav-link" href="/docs">API docs</a>
+        <a class="nav-link" href="/profile">My profile</a>
       </li>
+      {% endif %}
+      <li class="nav-item">
+        <a class="nav-link" href="/docs" target="_blank">API docs</a>
+      </li>
+      {% if request.session.get('access_token') %}
       <li class="nav-item">
         <a class="nav-link" href="/logout">Logout</a>
       </li>
+      {% endif %}
     </ul>
   </div>
 </nav>

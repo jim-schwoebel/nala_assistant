@@ -123,6 +123,9 @@ reuseable_oauth = OAuth2PasswordBearer(
 	scheme_name="JWT"
 )
 
+# settings
+settings=json.load(open('settings.json'))
+
 # front-end routes
 #############################
 # /main page
@@ -161,6 +164,7 @@ def logout(request: Request, db: Session = Depends(get_db)):
 	'''
 		Home page.
 	'''
+	request.session.clear()
 	return templates.TemplateResponse("logout.html", {"request": request})
 
 # /register
@@ -200,9 +204,25 @@ def bark_assistant(access_token: str, refresh_token: str, request: Request, db: 
 	request.session["refresh_token"] = refresh_token
 	return templates.TemplateResponse("audio_wake.html", {"request": request})
 
-# /docs 
-	# docs
-
+@app.get("/profile", response_class=HTMLResponse, 
+				  tags=["templates"], 
+				  status_code=200, 
+				  include_in_schema=False)
+def my_profile(request: Request, db: Session = Depends(get_db)):
+	'''
+		Profile page.
+	'''
+	token_payload=helpers.token_decode(request.session["access_token"], JWT_SECRET_KEY, ALGORITHM)
+	user = db.query(models.User).filter_by(user_id=helpers.str_to_uuid(token_payload['user_id'])).first()
+	request.session['user']={"create_date": str(user.create_date), "user_id": str(user.user_id), "email": user.email, "first": user.first_name, "last": user.last_name, "language": user.language, "sound": user.sound, "voice": user.voice, "response_type": user.response_type}
+	request.session['settings']=settings
+	if user:
+		return templates.TemplateResponse("profile.html", {"request": request})
+	else:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Could not find user",
+		)
 
 # back-end routes 
 #############################
@@ -233,7 +253,11 @@ def register(payload: schemas.CreateUser, db: Session = Depends(get_db)):
 								  password_hash=pw_hash,
 								  user_id=helpers.uuid4(),
 								  reset_id=helpers.uuid4(),
-								  create_date=helpers.get_date())
+								  create_date=helpers.get_date(),
+								  language=settings['language']['default'],
+								  sound=settings['sounds']['default'],
+								  voice=settings['voice']['default'],
+								  response_type=settings['response_type']['default'])
 
 			db.add(db_user)
 			db.commit()
@@ -274,19 +298,64 @@ def login(payload: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(
 			raise HTTPException(status_code=401, detail="Invalid username or password")
 
 		# make new login session
+		now=datetime.datetime.now()
 		session=models.Session(session_id=helpers.uuid4(),
 								user_id=user.user_id,
-								create_date=datetime.datetime.now())
-
+								create_date=now)
 		db.add(session)
+		# update user information 
+		user.last_login=now
+		user.login_number=user.login_number+1
+
+		# commit to database
 		db.commit()
 
+		# return response
 		access_token = helpers.create_access_token(str(user.user_id), str(session.session_id), user.email, ALGORITHM, JWT_SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES)
 		refresh_token = helpers.create_refresh_token(str(user.user_id), str(session.session_id), user.email, ALGORITHM, JWT_REFRESH_SECRET_KEY, REFRESH_TOKEN_EXPIRE_MINUTES)
 		response=schemas.LoginResponse(access_token=access_token, refresh_token=refresh_token, session_id=session.session_id)
 		return response
 	else:
 		raise HTTPException(status_code=403, detail="User does not exist.")
+
+# update user
+@app.put("/api/user/update",
+	responses={
+		200: {"model": schemas.Response_Message},
+		401: {
+			"model": schemas.HTTPError,
+			"description": "Token expired",
+		},
+		403: {
+			"model": schemas.HTTPError,
+			"description": "Could not validate credential",
+		},
+		404: {
+			"model": schemas.HTTPError,
+			"description": "User not found",
+		},
+	}, 
+	tags=["users"], 
+	status_code=200)
+def update_user(payload: schemas.UpdateUser,token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+	token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
+	user = db.query(models.User).filter_by(email=token_payload['sub']).first()
+
+	if user is None:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Could not find user",
+		)
+	# update user
+	user.first_name=payload.first 
+	user.last_name=payload.last
+	user.language=payload.language
+	user.sound=payload.sound
+	user.voice=payload.voice
+	user.response_type=payload.response_type
+	db.commit()
+
+	return schemas.Response_Message(message='Successfully edited user.')
 
 # jwt protected route
 @app.get("/api/user/details",
@@ -329,9 +398,6 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 	token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
 	user = db.query(models.User).filter_by(user_id=helpers.str_to_uuid(token_payload['user_id'])).first()
 	current_directory = os.getcwd()
-
-	print(token_payload)
-	print(user)
 	
 	if user is None:
 		raise HTTPException(
