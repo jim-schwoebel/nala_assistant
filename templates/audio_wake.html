@@ -26,6 +26,8 @@ function initAudioContext() {
 
 // Start recording
 function startRecording() {
+  document.getElementById('stopBtn').style.display = "block";
+  document.getElementById('playBtn2').style.display = "none";
   navigator.mediaDevices.getUserMedia({ audio: true })
     .then(function(stream) {
       mediaRecorder = new MediaRecorder(stream);
@@ -53,6 +55,9 @@ function startRecording() {
 function stopRecording() {
   chBackcolor('lightgray');
   mediaRecorder.stop();
+  var description = document.getElementById('description');
+  description.innerHTML = "<em><h4><div class='spinner-border' role='status'><span class='sr-only'>Loading...</span></div>&nbsp;Loading...</h4></em>"
+  document.getElementById('stopBtn').style.display = "none";
 
   mediaRecorder.addEventListener('stop', function() {
     audioBlob = new Blob(chunks, { type: mediaRecorder.mimeType });
@@ -60,20 +65,22 @@ function stopRecording() {
     recordBtn.disabled = false;
     stopBtn.disabled = true;
     playBtn.disabled = false;
-
-    createWaveform();
+    // now process audio file recorded
+    playBtn.click()
     // continue streaming back-to-back
-    recordBtn.click();
+    // recordBtn.click();
   });
 }
 
-// Play recorded audio
-async function playAudio() {
+// Create waveform using Wavesurfer.js
+function playAudio() {
   // var audioElement = document.getElementById('audioPlayer');
   // audioElement.src = URL.createObjectURL(audioBlob);
   // audioElement.play();
   document.getElementById("waveform").innerHTML = "";
   var waveformElement = document.getElementById('waveform');
+  var description = document.getElementById('description');
+  description.innerHTML = "<em><h4><div class='spinner-border' role='status'><span class='sr-only'>Loading...</span></div>&nbsp;Loading...</h4></em>"
   waveform = WaveSurfer.create({
     container: waveformElement,
     waveColor: 'violet',
@@ -83,12 +90,7 @@ async function playAudio() {
     responsive: true
   });
   sendAudioRequestWithJWT(audioBlob);
-}
-
-// Create waveform using Wavesurfer.js
-function createWaveform() {
-  playAudio();
-}
+};
 
 // Wakeword detection
 function detectWakeword() {
@@ -96,7 +98,8 @@ function detectWakeword() {
   document.getElementById('rating-region').style.display = "none";
   document.getElementById('description').innerHTML = "<em><h4>now say <strong>hey nala</strong> to query</h4></em>"
   document.getElementById('recordBtn').style.display = "none";
-  var recognition = new webkitSpeechRecognition();
+  SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+  recognition = new SpeechRecognition;
   recognition.continuous = true;
   recognition.lang = 'en-US';
 
@@ -104,7 +107,8 @@ function detectWakeword() {
     for (var i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) {
         var transcript = event.results[i][0].transcript.toLowerCase();
-        if (transcript.includes('nala')) {
+        console.log(transcript);
+        if (transcript.includes('nala') || transcript.includes('nalle') || transcript.includes('nahla')) {
           playChime();
           recognition.stop();
           break;
@@ -144,7 +148,8 @@ function startSilenceTimeout() {
 
 // Start speech recognition
 function startRecognition() {
-  recognition = new webkitSpeechRecognition();
+  SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition;
   recognition.continuous = true;
 
   // Speech recognition event handlers
@@ -182,9 +187,9 @@ function chBackcolor(color) {
 };
 
 var sound = new Howl({
-  src: ['/static/sounds/chime.wav'],
+  src: ['/static/sounds/tone.wav'],
   onplay: function() {
-    document.getElementById('description').innerHTML = "<em><h4>Hello! How can I help you?</h4></em>"
+    document.getElementById('description').innerHTML = "<em><h4><strong>Hello!</strong> How can I help you?</h4></em>"
     chBackcolor('#ffc2e5');
 
   },
@@ -201,10 +206,10 @@ function playChime() {
 
 // Function to send an HTTP POST request with JWT authorization
 function sendAudioRequestWithJWT(audioBlob) {
-  // Add loading icon
+  // reinforce = loading state
   var description = document.getElementById('description');
-  description.innerHTML = "<em><h4><div class='spinner-border' role='status'><span class='sr-only'>Loading...</span></div>&nsbp;Loading...</h4></em>"
-
+  description.innerHTML = "<em><h4><div class='spinner-border' role='status'><span class='sr-only'>Loading...</span></div>&nbsp;Loading...</h4></em>"
+  
   // Create a new FormData object
   const formData = new FormData();
 
@@ -225,17 +230,19 @@ function sendAudioRequestWithJWT(audioBlob) {
   .then(blob => {
     // Use the blob as needed, for example, create an audio element and play it
     // const audioElement = new Audio(URL.createObjectURL(blob));
-    description.innerHTML = "<em><h4>now say <strong>hey nala</strong> to query</h4></em>"
     // load audio and play it
     waveform.loadBlob(blob);
     waveform.on('ready', function () {
+      description.innerHTML = "<em><h4><strong><i class='bi bi-play'></i>&nbsp;playing response</h4></strong></em>"
       waveform.play();
     });
     waveform.on('finish', function () { 
       get_query_id();
+      description.innerHTML = "<em><h4><strong>please rate</strong> the query response</h4></em>"
+      document.getElementById('playBtn2').style.display = "block";
     });
   })
-  .then(detectWakeword)
+  //.then(detectWakeword)
   .catch(error => {
     console.error('Error:', error)
   });
@@ -259,10 +266,10 @@ function browserDetect(){
      browserName="No browser detection";
    }
   
-  if(browserName != 'chrome') {
+  if(browserName != "chrome" && browserName != "safari") {
     Swal.fire({icon: "error",
                   title: "Chrome browser required.",
-                  text:  "You are using "+ browserName +" browser. This application only works with chrome-based browsers. Please login on a chrome browser to continue.",
+                  text:  "You are using "+ browserName +" browser. This application only works with chrome-based or safari-based browsers. Please login on a chrome/safari browser to continue.",
                   confirmButtonColor: '#2d80f9',
                   confirmButtonText: 'close'}).then(function() {window.location = "/";});
 
@@ -344,6 +351,9 @@ function rate_query(rating) {
       //   element.classList.add("btn-primary-outline");
       // };
       document.getElementById('rating-region').style.display = "none";
+      var description = document.getElementById('description');
+      description.innerHTML = "<em><h4>now say <strong>hey nala</strong> to query</h4></em>"
+
     })
     .then(detectWakeword)
     .catch(function (error) {
@@ -351,7 +361,7 @@ function rate_query(rating) {
       console.error(error);
     });
 };
-
+// immediately disappear a few regions / perform functions
 browserDetect();
 </script>
 <body>
@@ -362,8 +372,9 @@ browserDetect();
         <hr></hr>
           <div id='button-region' class="d-flex flex-column align-items-center mt-4">
             <button id="recordBtn" class="btn btn-danger-outline" onclick="chBackcolor('lightgray');"><i class="bi bi-mic"></i> Grant mic access</button>
-            <button id="stopBtn" class="btn btn-black-outline" disabled><i class="bi bi-stop-circle"></i> Stop</button> 
-            <button id="playBtn" class="btn btn-black-outline" disabled><i class="bi bi-play-circle"></i> Play</button>
+            <button id="stopBtn" class="btn btn-black-outline" style="display: none" disabled><i class="bi bi-stop-circle"></i> Stop</button> 
+            <button id="playBtn" class="btn btn-black-outline" style="display: none" disabled><i class="bi bi-play-circle"></i> Play</button>
+            <button id="playBtn2" class="btn btn-black-outline" style="display: none" onclick="waveform.play(); detectWakeword()"><i class="bi bi-play-circle"></i> Play</button>
           </div>
         </div>
       </div>

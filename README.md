@@ -1,7 +1,22 @@
-# bark_assistant
-bark assistant - some thoughts on how to make the Bark model into a voice assistant.
+# nala_assistant
+
+Nala is an exceptional voice assistant framework specifically designed to cater to developers' needs. With its user-friendly architecture and straightforward extensibility, Nala empowers developers to create customized voice assistants effortlessly. Seamlessly integrate voice capabilities into your applications and devices, and provide users with a truly interactive and hands-free experience.
+
+![](https://media.giphy.com/media/VDzVG8lvNRufu/giphy.gif)
+
+Key Features for Developers:
+
+- **Extensible Architecture:** Nala offers a flexible and modular architecture that allows developers to extend its functionality with ease. Integrate voice commands, natural language processing, and intelligent responses into your projects effortlessly.
+- **Customized Voice Actions:** Define and customize voice commands to suit your application's requirements. Empower users to interact with your software using natural language, enhancing the overall user experience.
+- **Rapid Integration:** With Nala's intuitive APIs and comprehensive documentation, integrating voice capabilities into your projects is a breeze. Save development time and effort while providing a powerful voice interface for your users.
+- **Multi-Platform Support:** Nala is designed to work seamlessly across various platforms and operating systems. Whether you're building web applications, mobile apps, or even IoT devices, Nala can be easily integrated into your technology stack.
+- **Machine Learning Capabilities:** Leverage Nala's built-in machine learning capabilities to improve voice recognition accuracy and enhance the overall intelligence of your voice assistant. Train and fine-tune the model to adapt to specific user requirements.
+- **Privacy and Security:** Nala prioritizes user privacy and data security. Rest assured that all voice interactions are handled with utmost care, ensuring the confidentiality and integrity of user information.
+
+Note that this is a web-enabled version of [a prior voice assistant app here](https://github.com/jim-schwoebel/nala).
 
 ## getting started
+
 ```
 sudo apt-get install ffmpeg
 git clone git@github.com:jim-schwoebel/bark_assistant.git
@@ -17,10 +32,7 @@ You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appicat
 ## deploying to server
 1. get a cloudflare account.
 2. setup app on a cloud provider 
-
-## tools used
-- [minio](https://github.com/minio/minio) - minio is an object storage platform
-- [auth0](https://github.com/auth0) - authentication
+3. deploy using the instructions below
 
 ## javascript front-endd 
 - [bootstrap icons](https://icons.getbootstrap.com/) - use bootstrap and bootstrap icons for javascript front-end
@@ -30,7 +42,14 @@ You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appicat
 - [audio.js](http://kolber.github.io/audiojs/) - playback audio alternative (setting)
 
 ## feature extraction
-- [meyda](https://github.com/meyda/meyda) - audio feature extraction and visualization
+- [python_speech_features](https://github.com/jim-schwoebel/allie/blob/master/features/audio_features/pspeech_features.py) - audio feature extraction method useed
+- [audio_features - Allie](https://github.com/jim-schwoebel/allie/tree/master/features/audio_features)
 
-## audio annotation
-- [peak.js](https://waveform.prototyping.bbc.co.uk/) - peak.js is an audio annotation library
+## browser compatibility
+Currently, Nala works on Chrome and Safari-based browsers based on [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript) standards. If you load Nala on any other browser, it will give an error message like this.
+
+![](https://github.com/jim-schwoebel/bark_assistant/tree/main//static/images/error.png)
+
+## future tools used
+- [minio](https://github.com/minio/minio) - minio is an object storage platform
+- [auth0](https://github.com/auth0) - authentication
