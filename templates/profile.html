@@ -109,5 +109,5 @@ function edit_profile() {
   .then(window.location.replace("/bark?access_token={{request.session.get('access_token')}}&refresh_token={{request.session.get('refresh_token')}}"));
 }
 </script>
-
+{% include 'footer.html' %}
 </html>

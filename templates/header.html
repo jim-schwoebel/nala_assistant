@@ -17,7 +17,12 @@
   </style>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="/">&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-emoji-laughing"></i> Nala</a>
+{% if request.session.get('access_token') %}
+<a class="navbar-brand" href="/bark?access_token={{request.session.get('access_token')}}&refresh_token={{request.session.get('refresh_token')}}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-emoji-laughing"></i> Nala</a>
+{% else %}
+<a class="navbar-brand" href="/">&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-emoji-laughing"></i> Nala</a>
+{% endif %}
+ 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>

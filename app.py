@@ -139,7 +139,8 @@ def home(request: Request, db: Session = Depends(get_db)):
 		Home page.
 	'''
 	request.session["base_url"] = "/"
-	request.session['nowtime'] = datetime.datetime.now().year
+	request.session['year'] = datetime.datetime.now().year
+	request.session["version"] = os.getenv("VERSION")
 	return templates.TemplateResponse("home.html", {"request": request})
 
 # /login
@@ -432,9 +433,9 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 	query.features=features
 
 	# get back query action response and store in system
-	text_response ='this is a response to' + transcript
+	text_response = helpers.query_response(transcript)
 	query.response = text_response
-	query.response_method = 'test'
+	query.response_method = user.response_type
 	helpers.tts_generate(text_response, 'response_'+filename)
 
 	# store in database

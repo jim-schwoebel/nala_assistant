@@ -42,6 +42,11 @@ tts_processor = SpeechT5Processor.from_pretrained("microsoft/speecht5_tts")
 tts_model = SpeechT5ForTextToSpeech.from_pretrained("microsoft/speecht5_tts")
 tts_vocoder = SpeechT5HifiGan.from_pretrained("microsoft/speecht5_hifigan")
 
+from transformers import BlenderbotTokenizer, BlenderbotForConditionalGeneration
+mname = "facebook/blenderbot-400M-distill"
+blender_model = BlenderbotForConditionalGeneration.from_pretrained(mname)
+blender_tokenizer = BlenderbotTokenizer.from_pretrained(mname)
+
 ########################################
 ##            DB Helpers              ##
 ########################################
@@ -245,16 +250,18 @@ def audio_featurize(file: str):
 
 	return json.dumps(dict(zip(labels,features)))
 
-def query_response(transcript: str, response_type: str = 'blenderbot') -> str:
+def query_response(transcript: str, response_type: str = 'blender', blender_model=blender_model, blender_tokenizer=blender_tokenizer) -> str:
 	'''transcript --LLM--> question
 			--> response limit (200 tokens)''' 
 	# Q&A task --> info
 	# ordering pizza --> action 
-	if response_type == 'blenderbot':
+	if response_type == 'blender':
 		# api call
-		response=transcript 
-	elif response_type == 'chatgpt4':
-		# api call
+		UTTERANCE = transcript
+		inputs = blender_tokenizer([UTTERANCE], return_tensors="pt")
+		reply_ids = blender_model.generate(**inputs)
+		response=blender_tokenizer.batch_decode(reply_ids)[0]
+	else:
 		response=transcript 
 	return response
 
