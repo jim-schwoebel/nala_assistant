@@ -16,7 +16,7 @@ Key Features for Developers:
 Note that this is a web-enabled version of [a prior voice assistant app here](https://github.com/jim-schwoebel/nala).
 
 ## getting started
-
+Install basic dependencies:
 ```
 sudo apt-get install ffmpeg
 git clone git@github.com:jim-schwoebel/bark_assistant.git
@@ -24,6 +24,17 @@ cd bark_assistant
 virtualenv env 
 source env/bin/activate
 pip3 install -r requirements.txt
+```
+Generate a secret key for `SESSION_SECRET`, `JWT_SECRET_KEY`, `JWT_REFRESH_SECRET_KEY` and environment vars using the following line of code 3 times (save this in `.env`)
+```
+python -c 'import secrets; print(secrets.token_hex())'
+```
+To open and edit .env file
+```
+nano .env
+```
+Then run the app:
+```
 uvicorn app:app --reload
 ```
 
