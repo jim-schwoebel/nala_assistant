@@ -21,6 +21,7 @@ MarkupSafe==2.1.2
 minio==7.1.15
 numpy==1.24.3
 pandas==2.0.1
+passlib
 pycparser==2.21
 pydantic==1.10.7
 PyJWT
