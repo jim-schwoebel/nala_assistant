@@ -41,9 +41,20 @@ uvicorn app:app --reload
 You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appication.
 
 ## deploying to server
-1. get a cloudflare account.
-2. setup app on a cloud provider 
-3. deploy using the instructions below
+
+Follow these instructions to deploy on a server.
+
+1. buy a domain on namecheap.com.
+2. get a vultr account / forward DNS to cloudflare from domain.
+3. get a cert.pem and private.pem file on cloudflare for the server.
+4. create a virtual machine on vultr or a similar platform, forward CNAME on cloudflare to IP address of host.
+5. run the command on the server with uvicorn below
+
+```
+nohup gunicorn --bind {ip_address}:443 main:app --certfile=cert.pem --keyfile=private.pem -w 10 --graceful-timeout 30 -t 30 --worker-class=uvicorn.workers.UvicornWorker --workers 10 </dev/null &>/dev/null &
+```
+
+`</dev/null &>/dev/null &` is a statement means that it is a background job, and you need to change [ip_address] with the right IP adddress.
 
 ## javascript front-endd 
 - [bootstrap icons](https://icons.getbootstrap.com/) - use bootstrap and bootstrap icons for javascript front-end
