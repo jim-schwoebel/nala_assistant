@@ -1,1 +1,1 @@
-{"sounds": {"default": "chime", "options": ["chime", "bell"]}, "voice": {"default": "microsoft", "options": ["microsoft"]}, "response_type": {"default": "dolly", "options": ["blender","dolly"]}, "language": {"default": "en-us", "options": ["en-us"]}}
+{"sounds": {"default": "chime", "options": ["chime", "bell"]}, "voice": {"default": "microsoft", "options": ["microsoft"]}, "response_type": {"default": "blender", "options": ["blender","dolly"]}, "language": {"default": "en-us", "options": ["en-us"]}}
