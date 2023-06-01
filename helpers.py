@@ -266,7 +266,7 @@ def query_response(transcript: str, response_type: str, blender_model=blender_mo
 		reply_ids = blender_model.generate(**inputs)
 		response=blender_tokenizer.batch_decode(reply_ids)[0]
 	elif response_type == 'dolly':
-		res = dolly_model("Explain to me the difference between nuclear fission and fusion.")
+		res = dolly_model(transcript)
 		response=res[0]["generated_text"]
 	else:
 		response=transcript 
