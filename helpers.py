@@ -254,7 +254,7 @@ def audio_featurize(file: str):
 
 	return json.dumps(dict(zip(labels,features)))
 
-def query_response(transcript: str, response_type: str = 'blender', blender_model=blender_model, blender_tokenizer=blender_tokenizer, dolly_model=dolly_model) -> str:
+def query_response(transcript: str, response_type: str, blender_model=blender_model, blender_tokenizer=blender_tokenizer, dolly_model=dolly_model) -> str:
 	'''transcript --LLM--> question
 			--> response limit (200 tokens)''' 
 	# Q&A task --> info

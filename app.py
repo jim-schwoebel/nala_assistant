@@ -433,7 +433,7 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 	query.features=features
 
 	# get back query action response and store in system
-	text_response = helpers.query_response(transcript)
+	text_response = helpers.query_response(transcript, user.response_type)
 	query.response = text_response
 	query.response_method = user.response_type
 	helpers.tts_generate(text_response, 'response_'+filename)
