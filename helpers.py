@@ -17,14 +17,13 @@ from typing import Union, Any
 import models
 from email_validator import validate_email, EmailNotValidError
 
-from transformers import WhisperProcessor, WhisperForConditionalGeneration, SpeechT5Processor, SpeechT5ForTextToSpeech, SpeechT5HifiGan
+from transformers import WhisperProcessor, WhisperForConditionalGeneration, SpeechT5Processor, SpeechT5ForTextToSpeech, SpeechT5HifiGan, pipeline
 import numpy as np
 import soundfile as sf 
 import os, json, datetime
 from datasets import load_dataset
 import torch
 from datasets import load_dataset
-
 import numpy as np 
 from python_speech_features import mfcc
 from python_speech_features import logfbank
@@ -46,6 +45,11 @@ from transformers import BlenderbotTokenizer, BlenderbotForConditionalGeneration
 mname = "facebook/blenderbot-400M-distill"
 blender_model = BlenderbotForConditionalGeneration.from_pretrained(mname)
 blender_tokenizer = BlenderbotTokenizer.from_pretrained(mname)
+
+# import dolly
+# https://huggingface.co/databricks/dolly-v2-12b (large)
+# https://huggingface.co/databricks/dolly-v2-3b (small)
+dolly_model = pipeline(model="databricks/dolly-v2-3b", torch_dtype=torch.bfloat16, trust_remote_code=True, device_map="auto")
 
 ########################################
 ##            DB Helpers              ##
@@ -250,7 +254,7 @@ def audio_featurize(file: str):
 
 	return json.dumps(dict(zip(labels,features)))
 
-def query_response(transcript: str, response_type: str = 'blender', blender_model=blender_model, blender_tokenizer=blender_tokenizer) -> str:
+def query_response(transcript: str, response_type: str = 'blender', blender_model=blender_model, blender_tokenizer=blender_tokenizer, dolly_model=dolly_model) -> str:
 	'''transcript --LLM--> question
 			--> response limit (200 tokens)''' 
 	# Q&A task --> info
@@ -261,6 +265,9 @@ def query_response(transcript: str, response_type: str = 'blender', blender_mode
 		inputs = blender_tokenizer([UTTERANCE], return_tensors="pt")
 		reply_ids = blender_model.generate(**inputs)
 		response=blender_tokenizer.batch_decode(reply_ids)[0]
+	elif response_type == 'dolly':
+		res = dolly_model("Explain to me the difference between nuclear fission and fusion.")
+		response=res[0]["generated_text"]
 	else:
 		response=transcript 
 	return response
