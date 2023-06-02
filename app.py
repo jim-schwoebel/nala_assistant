@@ -7,7 +7,7 @@ Demonstrating a first-in-kind implementation of voice assistants
 on top of the Bark AI model.
 '''
 
-import os, datetime, time, json, io, pandas, uvicorn, random, jwt, uuid, shutil
+import os, datetime, time, json, io, pandas, uvicorn, random, jwt, uuid, shutil, csv
 from typing import List
 from fastapi import Depends, FastAPI, HTTPException, Request, status, File, UploadFile
 from fastapi.responses import HTMLResponse, FileResponse
@@ -523,6 +523,42 @@ def query_rate(payload: schemas.QueryRateString, token: str = Depends(reuseable_
 			status_code=status.HTTP_404_NOT_FOUND,
 			detail="Could not find user",
 		)
+
+@app.post("/api/download",
+			tags=["downloads"], 
+			response_class=FileResponse,
+			status_code=200) # include_in_schema=False)
+def download_data(token: str = Depends(reuseable_oauth), db: Session = Depends(get_db)):
+	# make sure it's the right user_id on token
+	token_payload=helpers.token_decode(token, JWT_SECRET_KEY, ALGORITHM)
+	user = db.query(models.User).filter_by(user_id=helpers.str_to_uuid(token_payload['user_id'])).first()
+
+	# download filename
+	filename = 'results.csv'
+
+	# list of superadmins
+	if user.email in ['jim.schwoebel@gmail.com']:
+		# arrange queries by descending order 
+		rows=db.query(models.Query).order_by(models.Query.create_date.desc()).all()
+		# Generate a CSV file
+		csv_data = []
+		headers = ['query_id', 'session_id', 'user_id', 'create_date', 'features', 'transcript', 'rating', 'response', 'response_method', 'language']
+		csv_data.append(headers)
+		for row in rows:
+		    csv_data.append([getattr(row, column) for column in headers])
+
+		# Save the CSV file
+		with open(filename, 'w', newline='') as file:
+		    writer = csv.writer(file)
+		    writer.writerows(csv_data)
+
+		return FileResponse(filename, filename=filename, media_type='text/csv')
+
+	else:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Could not find user",
+		)	
 
 # if we make a ML model to predict relevancy 
 # @app.post("/api/session/query/inference",
