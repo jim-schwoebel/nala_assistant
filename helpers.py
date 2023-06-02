@@ -270,6 +270,7 @@ def query_response(transcript: str, response_type: str, blender_model=blender_mo
 		response=res[0]["generated_text"]
 	else:
 		response=transcript 
+	print(response)
 	return response
 
 def cleanup_audio():
