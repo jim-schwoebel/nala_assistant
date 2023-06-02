@@ -50,6 +50,11 @@ Follow these instructions to deploy on a server.
 4. create a virtual machine on vultr or a similar platform, forward CNAME on cloudflare to IP address of host.
 5. run the command on the server with uvicorn below
 
+Enable firewall rules for SSL (port 443)
+```
+sudo ufw allow 80
+sudo ufw allo 443
+```
 ```
 nohup gunicorn --bind {ip_address}:443 main:app --certfile=cert.pem --keyfile=private.pem -w 10 --graceful-timeout 30 -t 30 --worker-class=uvicorn.workers.UvicornWorker --workers 10 </dev/null &>/dev/null &
 ```
