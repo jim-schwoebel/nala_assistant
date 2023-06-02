@@ -24,6 +24,7 @@ cd bark_assistant
 virtualenv env 
 source env/bin/activate
 pip3 install -r requirements.txt
+pip3 install git+https://github.com/suno-ai/bark.git
 ```
 Generate a secret key for `SESSION_SECRET`, `JWT_SECRET_KEY`, `JWT_REFRESH_SECRET_KEY` and environment vars using the following line of code 3 times (save this in `.env`)
 ```

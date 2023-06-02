@@ -30,6 +30,9 @@ from python_speech_features import logfbank
 from python_speech_features import ssc
 import scipy.io.wavfile as wav
 
+from bark import SAMPLE_RATE, generate_audio, preload_models
+from scipy.io.wavfile import write as write_wav
+
 # load model and processor into memory
 processor = WhisperProcessor.from_pretrained("openai/whisper-medium")
 model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-medium")
@@ -50,6 +53,9 @@ blender_tokenizer = BlenderbotTokenizer.from_pretrained(mname)
 # https://huggingface.co/databricks/dolly-v2-12b (large)
 # https://huggingface.co/databricks/dolly-v2-3b (small)
 dolly_model = pipeline(model="databricks/dolly-v2-3b", torch_dtype=torch.bfloat16, trust_remote_code=True, device_map="auto")
+
+# bark model
+preload_models()
 
 ########################################
 ##            DB Helpers              ##
@@ -153,11 +159,17 @@ def token_decode(token: str, JWT_SECRET_KEY: str, ALGORITHM: str):
 	return payload
 
 ## audio operations 
-def tts_generate(text: str, filename: str, speaker_embeddings=speaker_embeddings, processor=tts_processor, model=tts_model, vocoder=tts_vocoder):
+def tts_generate(text: str, filename: str, tts_type: str, speaker_embeddings=speaker_embeddings, processor=tts_processor, model=tts_model, vocoder=tts_vocoder):
 	# create tts prediction
-	inputs = processor(text=text, return_tensors="pt")
-	speech = model.generate_speech(inputs["input_ids"], speaker_embeddings, vocoder=vocoder)
-	sf.write(filename, speech.numpy(), samplerate=16000)
+
+	if tts_type == 'microsoft':
+		inputs = processor(text=text, return_tensors="pt")
+		speech = model.generate_speech(inputs["input_ids"], speaker_embeddings, vocoder=vocoder)
+		sf.write(filename, speech.numpy(), samplerate=16000)
+	elif tts_type == 'bark':
+		audio_array = generate_audio(text)
+		write_wav(filename, SAMPLE_RATE, audio_array)
+		
 	return filename
 
 def audio_transcribe(audio_file: str, model=model, processor=processor):
