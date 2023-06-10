@@ -1,1 +1,7 @@
-{"sounds": {"default": "chime", "options": ["chime", "bell"]}, "voice": {"default": "bark", "options": ["microsoft", "bark"]}, "response_type": {"default": "dolly", "options": ["blender","dolly"]}, "language": {"default": "en-us", "options": ["en-us"]}}
+{"website_name": "Nala",
+    "wake_word": "hey", 
+    "sounds": {"default": "chime", "options": ["chime", "bell"]}, 
+    "voice": {"default": "bark", "options": ["microsoft", "bark"]}, 
+    "response_type": {"default": "dolly", 
+    "options": ["blender","dolly", "echo"]}, 
+    "language": {"default": "en-us", "options": ["en-us"]}}

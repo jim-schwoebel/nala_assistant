@@ -18,9 +18,9 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
 {% if request.session.get('access_token') %}
-<a class="navbar-brand" href="/bark?access_token={{request.session.get('access_token')}}&refresh_token={{request.session.get('refresh_token')}}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-emoji-laughing"></i> Nala</a>
+<a class="navbar-brand" href="/bark?access_token={{request.session.get('access_token')}}&refresh_token={{request.session.get('refresh_token')}}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-emoji-laughing"></i> {{request.session.get('settings')['website_name']}}</a>
 {% else %}
-<a class="navbar-brand" href="/">&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-emoji-laughing"></i> Nala</a>
+<a class="navbar-brand" href="/">&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-emoji-laughing"></i> {{request.session.get('settings')['website_name']}}</a>
 {% endif %}
  
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

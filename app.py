@@ -40,6 +40,9 @@ from starlette.requests import Request
 # load environment vars in .env
 load_dotenv()
 
+# settings
+settings=json.load(open('settings.json'))
+
 # import schemas and database engine
 import models, schemas, helpers
 from database import *
@@ -58,11 +61,11 @@ tags_metadata = [
 app = FastAPI(
 	# following the docs https://fastapi.tiangolo.com/tutorial/metadata/
 	# advanced docs: https://fastapi.tiangolo.com/advanced/extending-openapi/
-	title="Bark assistant app",
-	description="Build a voice assistant with the Bark LLM model in <1 minute.",
-	version="0.0.2",
-	terms_of_service="http://example.com/terms/",
-	contact={"url": "https://barkassistant.com"},
+	title=settings['website_name']+" app",
+	description="Build a voice assistant in <1 minute.",
+	version=os.getenv("VERSION"),
+	terms_of_service=os.getenv("TERMS_URL"),
+	contact={"url": os.getenv("WEB_URL")},
 	openapi_tags=tags_metadata,
 	bearer_scheme = {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"},
 	oauth_flows = OAuthFlows(bearerFormat="JWT"))
@@ -123,9 +126,6 @@ reuseable_oauth = OAuth2PasswordBearer(
 	scheme_name="JWT"
 )
 
-# settings
-settings=json.load(open('settings.json'))
-
 # front-end routes
 #############################
 # /main page
@@ -141,6 +141,7 @@ def home(request: Request, db: Session = Depends(get_db)):
 	request.session["base_url"] = "/"
 	request.session['year'] = datetime.datetime.now().year
 	request.session["version"] = os.getenv("VERSION")
+	request.session['settings']=settings
 	return templates.TemplateResponse("home.html", {"request": request})
 
 # /login
@@ -203,6 +204,7 @@ def bark_assistant(access_token: str, refresh_token: str, request: Request, db: 
 	request.session['nowtime'] = datetime.datetime.now().year
 	request.session["access_token"] = access_token
 	request.session["refresh_token"] = refresh_token
+	request.session['settings']=settings
 	return templates.TemplateResponse("audio_wake.html", {"request": request})
 
 @app.get("/profile", response_class=HTMLResponse, 

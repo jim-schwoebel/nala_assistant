@@ -2,8 +2,40 @@
 <html lang="en">
 {% include 'header.html' %}
 <center>
-  <title>🦁 Nala</title>
+  <title>{{request.session.get('settings')['website_name']}}</title>
 </head>
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col">
+        <div id='description'><h4><em>Start by clicking the <strong>grant mic access</strong> button</em></h4></div>
+        <hr></hr>
+          <div id='button-region' class="d-flex flex-column align-items-center mt-4">
+            <button id="recordBtn" class="btn btn-danger-outline" onclick="chBackcolor('lightgray');"><i class="bi bi-mic"></i> Grant mic access</button>
+            <button id="stopBtn" class="btn btn-black-outline" style="display: none" disabled><i class="bi bi-stop-circle"></i> Stop</button> 
+            <button id="playBtn" class="btn btn-black-outline" style="display: none" disabled><i class="bi bi-play-circle"></i> Play</button>
+            <button id="playBtn2" class="btn btn-black-outline" style="display: none" onclick="waveform.play(); detectWakeword()"><i class="bi bi-play-circle"></i> Play</button>
+          </div>
+        </div>
+      </div>
+    <div class="row mt-5">
+      <div class="col">
+        <div id="waveform"></div>
+          <div id='rating-region' style="display: none">
+            <button id='thumbsup' class="btn btn-black-outline" onclick="rate_query(1)"><i class="bi bi-hand-thumbs-up"></i>&nbsp;like</button>
+            <button id='thumbsdown' class="btn btn-black-outline" onclick="rate_query(-1)"><i class="bi bi-hand-thumbs-down"></i>&nbsp;dislike</button>
+          </div>
+      </div>
+    </div>
+  </div>
+  <audio id="audioPlayer"></audio>
+</center>
+</body>
+</br>
+</br>
+</br>
+</br>
+</br>
 <script rel="preload">
 var audioContext;
 var mediaRecorder;
@@ -81,22 +113,14 @@ function playAudio() {
   var waveformElement = document.getElementById('waveform');
   var description = document.getElementById('description');
   description.innerHTML = "<em><h4><div class='spinner-border' role='status'><span class='sr-only'>Loading...</span></div>&nbsp;Loading...</h4></em>"
-  waveform = WaveSurfer.create({
-    container: waveformElement,
-    waveColor: 'violet',
-    progressColor: 'purple',
-    barHeight: 3,
-    height: 200,
-    responsive: true
-  });
-  sendAudioRequestWithJWT(audioBlob);
+  sendAudioRequestWithJWT(audioBlob, waveformElement, description);
 };
 
 // Wakeword detection
 function detectWakeword() {
   resetBtns();
   document.getElementById('rating-region').style.display = "none";
-  document.getElementById('description').innerHTML = "<em><h4>now say <strong>hey nala</strong> to query</h4></em>"
+  document.getElementById('description').innerHTML = "<em><h4>now say <strong>{{request.session.get('settings')['wake_word']}}</strong> to query</h4></em>"
   document.getElementById('recordBtn').style.display = "none";
   SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
   recognition = new SpeechRecognition;
@@ -108,7 +132,7 @@ function detectWakeword() {
       if (event.results[i].isFinal) {
         var transcript = event.results[i][0].transcript.toLowerCase();
         console.log(transcript);
-        if (transcript.includes('nala') || transcript.includes('nalle') || transcript.includes('nahla')) {
+        if (transcript.includes("{{request.session.get('settings')['wake_word']}}")) {
           playChime();
           recognition.stop();
           break;
@@ -205,11 +229,10 @@ function playChime() {
 };
 
 // Function to send an HTTP POST request with JWT authorization
-function sendAudioRequestWithJWT(audioBlob) {
+function sendAudioRequestWithJWT(audioBlob, waveformElement, description) {
   // reinforce = loading state
-  var description = document.getElementById('description');
   description.innerHTML = "<em><h4><div class='spinner-border' role='status'><span class='sr-only'>Loading...</span></div>&nbsp;Loading...</h4></em>"
-  
+
   // Create a new FormData object
   const formData = new FormData();
 
@@ -231,7 +254,20 @@ function sendAudioRequestWithJWT(audioBlob) {
     // Use the blob as needed, for example, create an audio element and play it
     // const audioElement = new Audio(URL.createObjectURL(blob));
     // load audio and play it
-    waveform.loadBlob(blob);
+    let audio = new Audio();
+    audio_url = URL.createObjectURL(blob);
+
+    waveform = WaveSurfer.create({
+      container: waveformElement,
+      waveColor: 'violet',
+      progressColor: 'purple',
+      backend: 'WebAudio',
+      barHeight: 3,
+      height: 200,
+      responsive: true,
+      url: audio_url,
+    });
+
     waveform.on('ready', function () {
       description.innerHTML = "<em><h4><strong><i class='bi bi-play'></i>&nbsp;playing response</h4></strong></em>"
       waveform.play();
@@ -352,7 +388,7 @@ function rate_query(rating) {
       // };
       document.getElementById('rating-region').style.display = "none";
       var description = document.getElementById('description');
-      description.innerHTML = "<em><h4>now say <strong>hey nala</strong> to query</h4></em>"
+      description.innerHTML = "<em><h4>now say <strong>{{request.session.get('settings')['wake_word']}}</strong> to query</h4></em>"
 
     })
     .then(detectWakeword)
@@ -364,37 +400,4 @@ function rate_query(rating) {
 // immediately disappear a few regions / perform functions
 browserDetect();
 </script>
-<body>
-  <div class="container mt-5">
-    <div class="row">
-      <div class="col">
-        <div id='description'><h4><em>Start by clicking the <strong>grant mic access</strong> button</em></h4></div>
-        <hr></hr>
-          <div id='button-region' class="d-flex flex-column align-items-center mt-4">
-            <button id="recordBtn" class="btn btn-danger-outline" onclick="chBackcolor('lightgray');"><i class="bi bi-mic"></i> Grant mic access</button>
-            <button id="stopBtn" class="btn btn-black-outline" style="display: none" disabled><i class="bi bi-stop-circle"></i> Stop</button> 
-            <button id="playBtn" class="btn btn-black-outline" style="display: none" disabled><i class="bi bi-play-circle"></i> Play</button>
-            <button id="playBtn2" class="btn btn-black-outline" style="display: none" onclick="waveform.play(); detectWakeword()"><i class="bi bi-play-circle"></i> Play</button>
-          </div>
-        </div>
-      </div>
-    <div class="row mt-5">
-      <div class="col">
-        <div id="waveform"></div>
-          <div id='rating-region' style="display: none">
-            <button id='thumbsup' class="btn btn-black-outline" onclick="rate_query(1)"><i class="bi bi-hand-thumbs-up"></i>&nbsp;like</button>
-            <button id='thumbsdown' class="btn btn-black-outline" onclick="rate_query(-1)"><i class="bi bi-hand-thumbs-down"></i>&nbsp;dislike</button>
-          </div>
-      </div>
-    </div>
-  </div>
-
-  <audio id="audioPlayer"></audio>
-</center>
-</body>
-</br>
-</br>
-</br>
-</br>
-</br>
 </html>
