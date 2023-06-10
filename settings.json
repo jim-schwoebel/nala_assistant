@@ -1,1 +1,6 @@
-{"sounds": {"default": "chime", "options": ["chime", "bell"]}, "voice": {"default": "bark", "options": ["microsoft", "bark"]}, "response_type": {"default": "dolly", "options": ["blender","dolly"]}, "language": {"default": "en-us", "options": ["en-us"]}}
+{"website_name": "GlazerBot",
+ "sounds": {"default": "chime", "options": ["chime", "bell"]}, 
+ "voice": {"default": "bark", "options": ["microsoft", "bark"]}, 
+ "response_type": {"default": "dolly", 
+ "options": ["blender","dolly", "david"]}, 
+ "language": {"default": "en-us", "options": ["en-us"]}}
