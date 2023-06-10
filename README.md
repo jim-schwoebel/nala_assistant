@@ -16,6 +16,8 @@ Key Features for Developers:
 Note that this is a web-enabled version of [a prior voice assistant app here](https://github.com/jim-schwoebel/nala).
 
 ## getting started
+
+### mac 
 Install basic dependencies:
 ```
 sudo apt-get install ffmpeg
@@ -30,7 +32,9 @@ Generate a secret key for `SESSION_SECRET`, `JWT_SECRET_KEY`, `JWT_REFRESH_SECRE
 ```
 python -c 'import secrets; print(secrets.token_hex())'
 ```
-To open and edit .env file
+Also, you need a `WEB_URL` and `TERMS_URL` for your website and the terms of use, accordingly. These also are in the `.env` file. 
+
+To open and edit .env file:
 ```
 nano .env
 ```
@@ -41,6 +45,33 @@ uvicorn app:app --reload
 
 You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appication.
 
+### linux with GPU
+Install basic dependencies:
+```
+sudo apt-get install ffmpeg
+git clone git@github.com:jim-schwoebel/bark_assistant.git
+cd bark_assistant
+virtualenv env 
+source env/bin/activate
+pip3 install -r gpu_requirements.txt
+pip3 install git+https://github.com/suno-ai/bark.git
+```
+Generate a secret key for `SESSION_SECRET`, `JWT_SECRET_KEY`, `JWT_REFRESH_SECRET_KEY` and environment vars using the following line of code 3 times (save this in `.env`)
+```
+python -c 'import secrets; print(secrets.token_hex())'
+```
+Also, you need a `WEB_URL` and `TERMS_URL` for your website and the terms of use, accordingly. These also are in the `.env` file. 
+
+To open and edit .env file:
+```
+nano .env
+```
+Then run the app:
+```
+uvicorn app:app --reload
+```
+
+You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appication.
 ## deploying to server
 
 Follow these instructions to deploy on a server.
