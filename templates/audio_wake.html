@@ -120,7 +120,7 @@ function playAudio() {
 function detectWakeword() {
   resetBtns();
   document.getElementById('rating-region').style.display = "none";
-  document.getElementById('description').innerHTML = "<em><h4>now say <strong>hey {{request.session.get('settings')['wake_word']}}</strong> to query</h4></em>"
+  document.getElementById('description').innerHTML = "<em><h4>now say <strong>{{request.session.get('settings')['wake_word']}}</strong> to query</h4></em>"
   document.getElementById('recordBtn').style.display = "none";
   SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
   recognition = new SpeechRecognition;
@@ -388,7 +388,7 @@ function rate_query(rating) {
       // };
       document.getElementById('rating-region').style.display = "none";
       var description = document.getElementById('description');
-      description.innerHTML = "<em><h4>now say <strong>hey {{request.session.get('settings')['wake_word']}}</strong> to query</h4></em>"
+      description.innerHTML = "<em><h4>now say <strong>{{request.session.get('settings')['wake_word']}}</strong> to query</h4></em>"
 
     })
     .then(detectWakeword)
