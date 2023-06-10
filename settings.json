@@ -1,6 +1,7 @@
 {"website_name": "Nala",
- "sounds": {"default": "chime", "options": ["chime", "bell"]}, 
- "voice": {"default": "bark", "options": ["microsoft", "bark"]}, 
- "response_type": {"default": "dolly", 
- "options": ["blender","dolly", "david"]}, 
- "language": {"default": "en-us", "options": ["en-us"]}}
+    "wake_word": "nala", 
+    "sounds": {"default": "chime", "options": ["chime", "bell"]}, 
+    "voice": {"default": "bark", "options": ["microsoft", "bark"]}, 
+    "response_type": {"default": "dolly", 
+    "options": ["blender","dolly", "echo"]}, 
+    "language": {"default": "en-us", "options": ["en-us"]}}

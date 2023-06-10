@@ -204,6 +204,7 @@ def bark_assistant(access_token: str, refresh_token: str, request: Request, db: 
 	request.session['nowtime'] = datetime.datetime.now().year
 	request.session["access_token"] = access_token
 	request.session["refresh_token"] = refresh_token
+	request.session['settings']=settings
 	return templates.TemplateResponse("audio_wake.html", {"request": request})
 
 @app.get("/profile", response_class=HTMLResponse, 

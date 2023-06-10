@@ -2,7 +2,7 @@
 <html lang="en">
 {% include 'header.html' %}
 <center>
-  <title>🦁 Nala</title>
+  <title>{{request.session.get('settings')['website_name']}}</title>
 </head>
 <body>
   <div class="container mt-5">
@@ -120,7 +120,7 @@ function playAudio() {
 function detectWakeword() {
   resetBtns();
   document.getElementById('rating-region').style.display = "none";
-  document.getElementById('description').innerHTML = "<em><h4>now say <strong>hey david</strong> to query</h4></em>"
+  document.getElementById('description').innerHTML = "<em><h4>now say <strong>hey {{request.session.get('settings')['wake_word']}}</strong> to query</h4></em>"
   document.getElementById('recordBtn').style.display = "none";
   SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
   recognition = new SpeechRecognition;
@@ -132,7 +132,7 @@ function detectWakeword() {
       if (event.results[i].isFinal) {
         var transcript = event.results[i][0].transcript.toLowerCase();
         console.log(transcript);
-        if (transcript.includes('hey') || transcript.includes('david')) {
+        if (transcript.includes("{{request.session.get('settings')['wake_word']}}")) {
           playChime();
           recognition.stop();
           break;
@@ -388,7 +388,7 @@ function rate_query(rating) {
       // };
       document.getElementById('rating-region').style.display = "none";
       var description = document.getElementById('description');
-      description.innerHTML = "<em><h4>now say <strong>hey david</strong> to query</h4></em>"
+      description.innerHTML = "<em><h4>now say <strong>hey {{request.session.get('settings')['wake_word']}}</strong> to query</h4></em>"
 
     })
     .then(detectWakeword)
