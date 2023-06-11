@@ -31,7 +31,7 @@ Note that this is a version 2.0, web-enabled version of [a prior voice assistant
 
 ## getting started
 
-### mac 
+### mac (locally)
 Install basic dependencies:
 ```
 sudo apt-get install ffmpeg
@@ -65,7 +65,7 @@ And sometimes this make it work.
 
 You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appication.
 
-### linux with GPU
+### linux with GPU (locally)
 Install basic dependencies:
 ```
 sudo apt-get install ffmpeg
@@ -95,12 +95,12 @@ You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appicat
 
 Note that you will need at least [1 NVIDIA V100 GPU](https://www.vultr.com/products/cloud-gpu/nvidia-a100/) to have a seamless user experience with the Bark model and various LLMs [like Dolly](https://github.com/databrickslabs/dolly).
 
-### api docs
+### api docs (locally)
 Once you have setup the app locally, you can get to the api docs @ `http://127.0.0.1:8000/docs` (for swagger docs) or `http://127.0.0.1:8000/redoc` (for redoc). The recommended set of docs to use is `http://127.0.0.1:8000/docs` (swagger) as there is greater support for authentication with JSON web tokens and audio-to-audio routes. A screenshot is shown below of the docs to give you an idea of what they look like. The auto-generated docs via FastAPI make it much easier to expand the routes to your particular need as a developer.
 
 ![](https://github.com/jim-schwoebel/nala_assistant/blob/main/static/images/docs.png)
 
-## deploying to server
+### deploying to server (externally)
 
 Follow these instructions to deploy on a server.
 
@@ -108,7 +108,7 @@ Follow these instructions to deploy on a server.
 2. get a vultr account / forward DNS to cloudflare from domain.
 3. get a cert.pem and private.pem file on cloudflare for the server.
 4. create a virtual machine on vultr or a similar platform, forward CNAME on cloudflare to IP address of host.
-5. set up the server with at least 1 NVIDIA V100 GPU (e.g. `pip3 install -r gpu_requirements.txt`), as described in the `linux with GPU section` (getting started) above
+5. set up the server with at least 1 NVIDIA V100 GPU (e.g. `pip3 install -r gpu_requirements.txt`), as described in the `linux with GPU (locally)` section (getting started) above
 6. run the command on the server with uvicorn below
 
 Enable firewall rules for SSL (port 443)
