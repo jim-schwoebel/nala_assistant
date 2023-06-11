@@ -261,8 +261,7 @@ def register(payload: schemas.CreateUser, db: Session = Depends(get_db)):
 								  sound=settings['sounds']['default'],
 								  voice=settings['voice']['default'],
 								  response_type=settings['response_type']['default'],
-								  audio_delete=settings['audio_delete']['default'],
-								  response_delete=settings['response_delete']['default'])
+								  audio_delete=settings['audio_delete']['default'])
 
 			db.add(db_user)
 			db.commit()
@@ -448,19 +447,6 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 
 	# cleanup audio files from root directory
 	helpers.cleanup_audio(user, filename)
-
-	# FUTURE
-	# ----------------
-	# operation - upload to s3 bucket (gcp) - FUTURE 
-	# if setting=openai_setting
-	# elif setting=bark_setting
-		# operation - send transcript to openAI API 
-		# operation - render bark audio file with agent model
-	# elif setting=action-setting 
-		# search actions, transcript = keyword 
-		# if keyword select response 
-		# render audio with microsoft TtS 
-	# ----------------
 
 	return FileResponse(current_directory+"/queries/response_"+filename, media_type="audio/mpeg")
 

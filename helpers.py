@@ -296,10 +296,9 @@ def cleanup_audio(user, filename: str):
 		os.remove(filename)
 	else:
 		shutil.move(curdir+'/'+filename, curdir+'/queries/'+filename)
-	if user.response_delete:
-		os.remove('response_'+filename)
-	else:
-		shutil.move(curdir+'/response_'+filename, curdir+'/queries/response_'+filename)
+	
+	# move response to proper folder
+	shutil.move(curdir+'/response_'+filename, curdir+'/queries/response_'+filename)
 
 ########################################
 ##       Main back-end functions      ##

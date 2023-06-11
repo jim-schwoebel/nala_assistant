@@ -49,7 +49,6 @@ class User(Base):
 	voice=Column(String(128))
 	response_type=Column(String(128))
 	audio_delete = Column(Boolean, default=False)
-	response_delete = Column(Boolean, default=False)
 	
 	# hashing functions for users/passwords
 	def hash_password(self, password):
@@ -80,7 +79,6 @@ class Query(Base):
 	state = Column(String(128))
 	country = Column(String(128))
 	audio_delete = Column(Boolean, default=False)
-	response_delete = Column(Boolean, default=False)
 
 class Integration(Base):
 	__tablename__ = 'integrations'

@@ -128,7 +128,6 @@ Here are the current settings that you can edit in th `settings.json` file:
     "wake_word": "hey", 
     "super_users": ["jim@schwoebel.me"],
     "audio_delete": {"default": false, "options": [true,false]},
-    "response_delete": {"default": false, "options": [true,false]},
     "sounds": {"default": "chime", "options": ["chime", "bell"]}, 
     "voice": {"default": "bark", "options": ["microsoft", "bark"]}, 
     "response_type": {"default": "dolly", "options": ["blender","dolly", "echo"]}, 
