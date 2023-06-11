@@ -130,7 +130,7 @@ Here are the current settings that you can edit in th `settings.json` file:
     "language": {"default": "en-us", "options": ["en-us"]}}
 ```
 
-You can edit the website name, wakeword, sounds, voice, response_type, options, and language here in the file. Note that the options listed here are currently the only options provided in the repository, but they are easy-to-extend as a framework later in the `helpers.py` file.
+You can edit the website name, wakeword, super_users (who can download data), sounds (after query), voice (response skin), response_type (e.g.  LLM models), and language (e.g. en-us only supported for now) here in the file. Note that the options listed here are currently the only options provided in the repository, but they are easy-to-extend as a framework later in the `helpers.py` file.
 
 ## browser compatibility
 Currently, Nala works on **Chrome** and **Safari**-based browsers based on [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript) standards. If you load Nala on any other browser, it will give an error message like this.
