@@ -100,7 +100,7 @@ nohup gunicorn --bind {ip_address}:443 main:app --certfile=cert.pem --keyfile=pr
 ## settings
 
 Here are the current settings that you can edit in th `settings.json` file:
-`json
+```json
 {"website_name": "Nala",
     "wake_word": "hey", 
     "sounds": {"default": "chime", "options": ["chime", "bell"]}, 
@@ -108,7 +108,7 @@ Here are the current settings that you can edit in th `settings.json` file:
     "response_type": {"default": "dolly", 
     "options": ["blender","dolly", "echo"]}, 
     "language": {"default": "en-us", "options": ["en-us"]}}
-`
+```
 
 You can edit the website name, wakeword, sounds, voice, response_type, options, and language here in the file. Note that the options listed here are currently the only options provided in the repository, but they are easy-to-extend as a framework later in the `helpers.py` file.
 
