@@ -110,10 +110,12 @@ Here are the current settings that you can edit in th `settings.json` file:
 You can edit the website name, wakeword, sounds, voice, response_type, options, and language here in the file. Note that the options listed here are currently the only options provided in the repository, but they are easy-to-extend as a framework later in the `helpers.py` file.
 
 ## browser compatibility
-Currently, Nala works on Chrome and Safari-based browsers based on [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript) standards. If you load Nala on any other browser, it will give an error message like this.
+Currently, Nala works on **Chrome** and **Safari**-based browsers based on [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript) standards. If you load Nala on any other browser, it will give an error message like this.
+
 ![](https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/error.png)
 
-Note that you can find a current list of browsers that support the Web Speech API [here](https://caniuse.com/?search=Web%20Speech%20API) or in the figure below.
+Note that you can find a current list of browsers that support the Web Speech API [here](https://caniuse.com/?search=Web%20Speech%20API) or in the figure below.\
+
 ![](https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/wspeeech_api.png?raw=true)
 
 ## references 
