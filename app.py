@@ -445,7 +445,7 @@ def query_sample_create(file: UploadFile, token: str = Depends(reuseable_oauth),
 	db.commit()
 
 	# cleanup audio files from root directory
-	helpers.cleanup_audio()
+	helpers.cleanup_audio(user, filename)
 
 	# FUTURE
 	# ----------------

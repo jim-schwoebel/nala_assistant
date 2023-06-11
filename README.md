@@ -63,7 +63,7 @@ python3 -m uvicorn app:app --reload
 
 And sometimes this make it work.
 
-You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appication.
+You will now be able to visit localhost (`http://127.0.0.1:8000`) to use application.
 
 ### linux with GPU (locally)
 Install basic dependencies:
@@ -129,6 +129,8 @@ Here are the current settings that you can edit in th `settings.json` file:
 {"website_name": "Nala",
     "wake_word": "hey", 
     "super_users": ["jim@schwoebel.me"],
+    "audio_delete": {"default": false, "options": [true,false]},
+    "response_delete": {"default": false, "options": [true,false]},
     "sounds": {"default": "chime", "options": ["chime", "bell"]}, 
     "voice": {"default": "bark", "options": ["microsoft", "bark"]}, 
     "response_type": {"default": "dolly", "options": ["blender","dolly", "echo"]}, 

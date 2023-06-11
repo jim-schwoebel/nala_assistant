@@ -42,6 +42,8 @@ class User(BaseModel):
     sound: Union[str, None] = None
     voice: Union[str, None] = None
     response_type: Union[str, None] = None
+    audio_delete: Union[bool, None] = False
+    response_delete: Union[bool, None] = False
 
     class Config:
         orm_mode = True
@@ -68,6 +70,9 @@ class Query(BaseModel):
     city: Union[str, None] = None
     state: Union[str, None] = None
     country: Union[str, None] = None
+    # settings 
+    audio_delete: Union[bool, None] = False
+    response_delete: Union[bool, None] = False
     class Config:
         orm_mode = True
 

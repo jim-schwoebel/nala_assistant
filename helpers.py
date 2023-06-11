@@ -285,15 +285,21 @@ def query_response(transcript: str, response_type: str, blender_model=blender_mo
 	# print(response)
 	return response
 
-def cleanup_audio():
+def cleanup_audio(user, filename: str):
 	'''
 	take in audio files and move them all into the 'queries' folder after a query.
 	'''
 	listdir=os.listdir()
 	curdir=os.getcwd()
-	for file in listdir:
-		if file.endswith('.wav'):
-			shutil.move(curdir+'/'+file, curdir+'/queries/'+file)
+	# delete according to user profile settings
+	if user.audio_delete:
+		os.remove(filename)
+	else:
+		shutil.move(curdir+'/'+filename, curdir+'/queries/'+filename)
+	if user.response_delete:
+		os.remove('response_'+filename)
+	else:
+		shutil.move(curdir+'/response_'+filename, curdir+'/queries/response_'+filename)
 
 ########################################
 ##       Main back-end functions      ##
