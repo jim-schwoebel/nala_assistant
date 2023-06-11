@@ -260,7 +260,9 @@ def register(payload: schemas.CreateUser, db: Session = Depends(get_db)):
 								  language=settings['language']['default'],
 								  sound=settings['sounds']['default'],
 								  voice=settings['voice']['default'],
-								  response_type=settings['response_type']['default'])
+								  response_type=settings['response_type']['default'],
+								  audio_delete=settings['audio_delete']['default'],
+								  response_delete=settings['response_delete']['default'])
 
 			db.add(db_user)
 			db.commit()
