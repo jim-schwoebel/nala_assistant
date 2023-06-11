@@ -8,11 +8,12 @@
 [![GitHub Issues](https://img.shields.io/github/issues/anfederico/Clairvoyant.svg)](https://github.com/jim-schwoebel/bark_assistant/blob/main/requirements.txt)
 [![License](https://img.shields.io/badge/license-Apache%202-blue)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)](https://github.com/users/jim-schwoebel/projects/2)
-![](https://img.shields.io/github/stars/jim-schwoebel/bark_assistant?style=social)
-   
+
  </p>
  
 # Nala
+![](https://img.shields.io/github/stars/jim-schwoebel/bark_assistant?style=social)
+
 Nala is a voice-assistant framework to quickly build and prototype voice assistants in <5 minutes within the greater context of the emerging large-language-model (LLM) landscape. With Nala you can easily intgrate with state-of-the-art (SOTA) transcription like [Whisper API](https://huggingface.co/docs/transformers/model_doc/whisper), text-to-speech synthesis engines like Microsoft's [SpeechT5 model](https://huggingface.co/microsoft/speecht5_tts), and LLMs like [Dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b) within a nice front-end - across any arbitrary wake word powered with the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript).
 
 ![](https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/output.gif)
