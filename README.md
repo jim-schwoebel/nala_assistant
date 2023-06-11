@@ -1,5 +1,5 @@
 # Nala
-Nala is a voice-assistant framework to quickly build and prototype voice assistants within the greater context of the emerging large-language-model (LLM) landscape. With Nala you can easily intgrate with state-of-the-art (SOTA) transcription like [Whisper API](), text-to-speech synthesis engines like Microsoft's [SpeechT5 model](https://huggingface.co/microsoft/speecht5_tts), and LLMs like [Dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b) within a nice front-end - across any arbitrary wake word powered with the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript).
+Nala is a voice-assistant framework to quickly build and prototype voice assistants within the greater context of the emerging large-language-model (LLM) landscape. With Nala you can easily intgrate with state-of-the-art (SOTA) transcription like [Whisper API](https://huggingface.co/docs/transformers/model_doc/whisper), text-to-speech synthesis engines like Microsoft's [SpeechT5 model](https://huggingface.co/microsoft/speecht5_tts), and LLMs like [Dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b) within a nice front-end - across any arbitrary wake word powered with the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript).
 
 - New visual here - gif of system
 
@@ -116,14 +116,19 @@ Currently, Nala works on Chrome and Safari-based browsers based on [Web Speech A
 ## references 
 
 ### javascript front-end 
-- [bootstrap icons](https://icons.getbootstrap.com/) - use bootstrap and bootstrap icons for javascript front-end
-- [recorder.js](https://github.com/mattdiamond/Recorderjs) - to record audio files with bootstrap icon buttons
-- [howlers.js](https://github.com/goldfire/howler.js) - playback audio for assistant
-- [wavesurfer.js](https://wavesurfer-js.org/) - for enumerating last audio file generated in the browser
 - [audio.js](http://kolber.github.io/audiojs/) - playback audio alternative (setting)
+- [bootstrap icons](https://icons.getbootstrap.com/) - use bootstrap and bootstrap icons for javascript front-end
+- [howlers.js](https://github.com/goldfire/howler.js) - playback audio for assistant
+- [recorder.js](https://github.com/mattdiamond/Recorderjs) - to record audio files with bootstrap icon buttons
+- [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript)
+- [wavesurfer.js](https://wavesurfer-js.org/) - for enumerating last audio file generated in the browser
 ### feature extraction
 - [python_speech_features](https://github.com/jim-schwoebel/allie/blob/master/features/audio_features/pspeech_features.py) - audio feature extraction method useed
 - [audio_features - Allie](https://github.com/jim-schwoebel/allie/tree/master/features/audio_features)
+### ML models (used)
+- [Dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b) - LLM (Databricks) 
+- [SpeechT5 model](https://huggingface.co/microsoft/speecht5_tts) - text-to-speech synthesis (Microsoft)
+- [Whisper API](https://huggingface.co/docs/transformers/model_doc/whisper) - speech-to-text (SOTA)
 ### future tools used
 - [minio](https://github.com/minio/minio) - minio is an object storage platform
 - [auth0](https://github.com/auth0) - authentication
