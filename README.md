@@ -106,8 +106,8 @@ Follow these instructions to deploy on a server.
 2. Get a vultr account / forward DNS to cloudflare from domain. Note that you will need at least [1 NVIDIA V100 GPU](https://www.vultr.com/products/cloud-gpu/nvidia-a100/) to have a seamless user experience with the Bark model and various LLMs [like Dolly](https://github.com/databrickslabs/dolly).
 3. Get a cert.pem and private.pem file on cloudflare for the server.
 4. Create a virtual machine on vultr or a similar platform, forward CNAME on cloudflare to IP address of host.
-5. Set up the server with at least 1 NVIDIA V100 GPU (e.g. `pip3 install -r gpu_requirements.txt`), as described in the [linux with GPU (locally)](https://github.com/jim-schwoebel/nala_assistant#linux-with-gpu-locally) section above
-6. Run the command on the server with uvicorn below
+5. Set up the server with at least 1 NVIDIA V100 GPU (e.g. `pip3 install -r gpu_requirements.txt`), as described in the [linux with GPU (locally)](https://github.com/jim-schwoebel/nala_assistant#linux-with-gpu-locally) section above.
+6. Run the command on the server with uvicorn below.
 
 Enable firewall rules for SSL (port 443)
 ```
