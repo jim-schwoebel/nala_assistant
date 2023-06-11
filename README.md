@@ -1,19 +1,16 @@
-# nala_assistant
+# Nala
+Nala is a voice-assistant framework to quickly build and prototype voice assistants within the greater context of the emerging large-language-model (LLM) landscape. With Nala you can easily intgrate with state-of-the-art (SOTA) transcription like [Whisper API](), text-to-speech synthesis engines like [](), and LLMs like Dolly/Blenderbot within a nice front-end powered with the Web Speech API.
 
-Nala is an exceptional voice assistant framework specifically designed to cater to developers' needs. With its user-friendly architecture and straightforward extensibility, Nala empowers developers to create customized voice assistants effortlessly. Seamlessly integrate voice capabilities into your applications and devices, and provide users with a truly interactive and hands-free experience.
+- New visual here - 
 
-![](https://media.giphy.com/media/VDzVG8lvNRufu/giphy.gif)
+Here are some key features for Developers:
 
-Key Features for Developers:
+- **Extensible Architecture:** Nala offers a flexible and modular, python-centric FastAPI architecture that allows developers to extend its functionality with ease. Integrate voice commands, natural language processing, and intelligent responses into your projects effortlessly.
+- **Rapid LLM Integration:** With Nala's intuitive APIs and comprehensive documentation, integrating LLM-enriched voice capabilities into your projects is a breeze. Save development time and effort while providing a powerful voice interface for your users.
+- **Multi-Platform Support:** Nala is designed to work seamlessly across various platforms and operating systems (e.g. Mac/Linux). Whether you're building web applications, mobile apps, or even IoT devices, Nala can be easily integrated into your technology stack.
+- **Privacy and Security:** Nala prioritizes user privacy and data security. Rest assured that all voice interactions are handled with utmost care, ensuring the confidentiality and integrity of user information. Easily tune encryption settings to the needs of your terms of use and users.
 
-- **Extensible Architecture:** Nala offers a flexible and modular architecture that allows developers to extend its functionality with ease. Integrate voice commands, natural language processing, and intelligent responses into your projects effortlessly.
-- **Customized Voice Actions:** Define and customize voice commands to suit your application's requirements. Empower users to interact with your software using natural language, enhancing the overall user experience.
-- **Rapid Integration:** With Nala's intuitive APIs and comprehensive documentation, integrating voice capabilities into your projects is a breeze. Save development time and effort while providing a powerful voice interface for your users.
-- **Multi-Platform Support:** Nala is designed to work seamlessly across various platforms and operating systems. Whether you're building web applications, mobile apps, or even IoT devices, Nala can be easily integrated into your technology stack.
-- **Machine Learning Capabilities:** Leverage Nala's built-in machine learning capabilities to improve voice recognition accuracy and enhance the overall intelligence of your voice assistant. Train and fine-tune the model to adapt to specific user requirements.
-- **Privacy and Security:** Nala prioritizes user privacy and data security. Rest assured that all voice interactions are handled with utmost care, ensuring the confidentiality and integrity of user information.
-
-Note that this is a web-enabled version of [a prior voice assistant app here](https://github.com/jim-schwoebel/nala).
+Note that this is a version 2.0, web-enabled version of [a prior voice assistant app here](https://github.com/jim-schwoebel/nala).
 
 ## getting started
 
