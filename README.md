@@ -117,6 +117,7 @@ Here are the current settings that you can edit in th `settings.json` file:
 ```json
 {"website_name": "Nala",
     "wake_word": "hey", 
+    "super_users": ["jim@schwoebel.me"],
     "sounds": {"default": "chime", "options": ["chime", "bell"]}, 
     "voice": {"default": "bark", "options": ["microsoft", "bark"]}, 
     "response_type": {"default": "dolly", 

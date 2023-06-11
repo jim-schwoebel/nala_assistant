@@ -539,7 +539,7 @@ def download_data(token: str = Depends(reuseable_oauth), db: Session = Depends(g
 	filename = 'results.csv'
 
 	# list of superadmins
-	if user.email in ['jim.schwoebel@gmail.com']:
+	if user.email in settings['super_users']:
 		# arrange queries by descending order 
 		rows=db.query(models.Query).order_by(models.Query.create_date.desc()).all()
 		# Generate a CSV file
