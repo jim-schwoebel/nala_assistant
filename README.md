@@ -113,6 +113,9 @@ You can edit the website name, wakeword, sounds, voice, response_type, options, 
 Currently, Nala works on Chrome and Safari-based browsers based on [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript) standards. If you load Nala on any other browser, it will give an error message like this.
 ![](https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/error.png)
 
+Note that you can find a current list of browsers that support the Web Speech API [here](https://caniuse.com/?search=Web%20Speech%20API) or in the figure below.
+![](https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/wspeech_api.png)
+
 ## references 
 Here is a quick list of references for additional reading. 
 
