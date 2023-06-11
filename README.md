@@ -108,7 +108,7 @@ Follow these instructions to deploy on a server.
 2. get a vultr account / forward DNS to cloudflare from domain.
 3. get a cert.pem and private.pem file on cloudflare for the server.
 4. create a virtual machine on vultr or a similar platform, forward CNAME on cloudflare to IP address of host.
-5. set up the server with at least 1 NVIDIA V100 GPU (e.g. `pip3 install -r gpu_requirements.txt`), as described in the `linux with GPU (locally)` section (getting started) above
+5. set up the server with at least 1 NVIDIA V100 GPU (e.g. `pip3 install -r gpu_requirements.txt`), as described in the `linux with GPU (locally)` section above
 6. run the command on the server with uvicorn below
 
 Enable firewall rules for SSL (port 443)
