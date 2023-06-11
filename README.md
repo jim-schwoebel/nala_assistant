@@ -1,4 +1,4 @@
-![]([https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/nala2.gif?raw=true](https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/output.gif?raw=true))
+![](https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/output.gif)
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 [![Python](https://img.shields.io/badge/python-v3.9+-blue.svg)](https://github.com/jim-schwoebel/allie/blob/master/Dockerfile)
