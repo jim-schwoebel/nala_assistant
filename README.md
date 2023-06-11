@@ -95,6 +95,11 @@ You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appicat
 
 Note that you will need at least [1 NVIDIA V100 GPU](https://www.vultr.com/products/cloud-gpu/nvidia-a100/) to have a seamless user experience with the Bark model and various LLMs [like Dolly](https://github.com/databrickslabs/dolly).
 
+### api docs
+Once you have setup the app locally, you can get to the api docs @ `http://127.0.0.1:8000/docs` (for swagger docs) or `http://127.0.0.1:8000/redoc` (for redoc). The recommended set of docs to use is `http://127.0.0.1:8000/docs` (swagger) as there is greater support for authentication with JSON web tokens and audio-to-audio routes. A screenshot is shown below of the docs to give you an idea of what they look like. The auto-generated docs via FastAPI make it much easier to expand the routes to your particular need as a developer.
+
+![](https://github.com/jim-schwoebel/nala_assistant/blob/main/static/images/docs.png)
+
 ## deploying to server
 
 Follow these instructions to deploy on a server.
