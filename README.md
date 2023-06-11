@@ -20,10 +20,10 @@ Nala is a voice-assistant framework to quickly build and prototype voice assista
 
 Here are some key features for Developers:
 
-- **Extensible Architecture:** Nala offers a flexible and modular, python-centric FastAPI architecture that allows developers to extend its functionality with ease. Integrate voice commands, natural language processing, and intelligent responses into your projects effortlessly.
-- **Rapid LLM Integration:** With Nala's intuitive APIs and comprehensive documentation, integrating LLM-enriched voice capabilities into your projects is a breeze. Save development time and effort while providing a powerful voice interface for your users.
-- **Multi-Platform Support:** Nala is designed to work seamlessly across various platforms and operating systems (e.g. Mac/Linux). Whether you're building web applications, mobile apps, or even IoT devices, Nala can be easily integrated into your technology stack.
-- **Privacy and Security:** Nala prioritizes user privacy and data security. Rest assured that all voice interactions are handled with utmost care, ensuring the confidentiality and integrity of user information. Easily tune encryption settings to the needs of your terms of use and users.
+- **Extensible Architecture:** Nala offers a flexible and modular, python-centric FastAPI architecture that allows developers to extend its functionality with ease. Integrate new response models or TTS voice skins into your projects effortlessly.
+- **Native LLM Integration:** Nala integrates directly with the the [Dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b) LLM model - and makes it easy for you to integrate with others using an easy-to-follow strategy with helper functions.
+- **Multi-Platform Support:** Nala is designed to work seamlessly across various platforms and operating systems (e.g. Mac/Linux and Chrome/Safari). Whether you're building web applications, mobile apps, or even IoT devices, Nala can be easily integrated into your technology stack.
+- **Privacy and Security:** Nala allows for downloads to be administered by superusers as specified in the `settings.json` - as well as authenticates users and sessions with standard JSON web tokens. Other features like encryption at rest, deletion of audio files, and other defaults are being worked on right now to preserve user privacy.
 
 Note that this is a version 2.0, web-enabled version of [a prior voice assistant app here](https://github.com/jim-schwoebel/nala).
 
