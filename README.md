@@ -93,8 +93,6 @@ uvicorn app:app --reload
 
 You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appication.
 
-Note that you will need at least [1 NVIDIA V100 GPU](https://www.vultr.com/products/cloud-gpu/nvidia-a100/) to have a seamless user experience with the Bark model and various LLMs [like Dolly](https://github.com/databrickslabs/dolly).
-
 ### api docs (locally)
 Once you have setup the app locally, you can get to the api docs @ `http://127.0.0.1:8000/docs` (for swagger docs) or `http://127.0.0.1:8000/redoc` (for redoc). The recommended set of docs to use is `http://127.0.0.1:8000/docs` (swagger) as there is greater support for authentication with JSON web tokens and audio-to-audio routes. A screenshot is shown below of the docs to give you an idea of what they look like. The auto-generated docs via FastAPI make it much easier to expand the routes to your particular need as a developer.
 
@@ -104,12 +102,12 @@ Once you have setup the app locally, you can get to the api docs @ `http://127.0
 
 Follow these instructions to deploy on a server.
 
-1. buy a domain on namecheap.com.
-2. get a vultr account / forward DNS to cloudflare from domain.
-3. get a cert.pem and private.pem file on cloudflare for the server.
-4. create a virtual machine on vultr or a similar platform, forward CNAME on cloudflare to IP address of host.
-5. set up the server with at least 1 NVIDIA V100 GPU (e.g. `pip3 install -r gpu_requirements.txt`), as described in the [linux with GPU (locally)](https://github.com/jim-schwoebel/nala_assistant#linux-with-gpu-locally) section above
-6. run the command on the server with uvicorn below
+1. Buy a domain on namecheap.com.
+2. Get a vultr account / forward DNS to cloudflare from domain. Note that you will need at least [1 NVIDIA V100 GPU](https://www.vultr.com/products/cloud-gpu/nvidia-a100/) to have a seamless user experience with the Bark model and various LLMs [like Dolly](https://github.com/databrickslabs/dolly).
+3. Get a cert.pem and private.pem file on cloudflare for the server.
+4. Create a virtual machine on vultr or a similar platform, forward CNAME on cloudflare to IP address of host.
+5. Set up the server with at least 1 NVIDIA V100 GPU (e.g. `pip3 install -r gpu_requirements.txt`), as described in the [linux with GPU (locally)](https://github.com/jim-schwoebel/nala_assistant#linux-with-gpu-locally) section above
+6. Run the command on the server with uvicorn below
 
 Enable firewall rules for SSL (port 443)
 ```
