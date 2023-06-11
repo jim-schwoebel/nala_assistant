@@ -1,4 +1,7 @@
-[![]](https://camo.githubusercontent.com/eeee9b9732ef382762afd4a9dfd9a126c850e377fb51ad5cd2654a1d5768acb6/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f56447a5647386c764e527566752f67697068792e676966)
+
+<p align="center">
+    ![](https://camo.githubusercontent.com/eeee9b9732ef382762afd4a9dfd9a126c850e377fb51ad5cd2654a1d5768acb6/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f56447a5647386c764e527566752f67697068792e676966)
+</p>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 [![Python](https://img.shields.io/badge/python-v3.9+-blue.svg)](https://github.com/jim-schwoebel/allie/blob/master/Dockerfile)
