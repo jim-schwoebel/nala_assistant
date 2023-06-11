@@ -34,8 +34,8 @@ Note that this is a version 2.0, web-enabled version of [a prior voice assistant
 Install basic dependencies:
 ```
 sudo apt-get install ffmpeg
-git clone git@github.com:jim-schwoebel/bark_assistant.git
-cd bark_assistant
+git clone git@github.com:jim-schwoebel/nala_assistant.git
+cd nala_assistant
 virtualenv env 
 source env/bin/activate
 pip3 install -r requirements.txt
@@ -62,8 +62,8 @@ You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appicat
 Install basic dependencies:
 ```
 sudo apt-get install ffmpeg
-git clone git@github.com:jim-schwoebel/bark_assistant.git
-cd bark_assistant
+git clone git@github.com:jim-schwoebel/nala_assistant.git
+cd nala_assistant
 virtualenv env 
 source env/bin/activate
 pip3 install -r gpu_requirements.txt
