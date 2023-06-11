@@ -24,6 +24,7 @@ Here are some key features for Developers:
 - **Native LLM Integration:** Nala integrates directly with the the [Dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b) LLM model - and makes it easy for you to integrate with others using an easy-to-follow strategy with helper functions.
 - **Multi-Platform Support:** Nala is designed to work seamlessly across various platforms and operating systems (e.g. Mac/Linux and Chrome/Safari). Whether you're building web applications, mobile apps, or even IoT devices, Nala can be easily integrated into your technology stack.
 - **Audio-to-Audio API**: Nala's FastAPI design allows for you to submit an audio file and get back audio file responses through the query-response model; few projects out there exist to help guide you through how to do this, so this may help accelerate learning for your voice assistant projects.
+- **Simple UI**: Nala provides a simple user interface for users to quickly rate responses with thumbs up or thumbs-down to aid in building reinforcement learning models with [Reinforcement Learning with Human Feedback](https://medium.com/aiguys/reinforcement-learning-from-human-feedback-instructgpt-and-chatgpt-693d00cb9c58).
 - **Privacy and Security:** Nala allows for downloads to be administered by superusers as specified in the `settings.json` - as well as authenticates users and sessions with standard JSON web tokens. Other features like encryption at rest, deletion of audio files, and other defaults are being worked on right now to preserve user privacy.
 
 Note that this is a version 2.0, web-enabled version of [a prior voice assistant app here](https://github.com/jim-schwoebel/nala).
@@ -164,6 +165,7 @@ Here is a quick list of references for additional reading.
 - [Dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b) - LLM (Databricks) 
 - [SpeechT5 model](https://huggingface.co/microsoft/speecht5_tts) - text-to-speech synthesis (Microsoft)
 - [Whisper API](https://huggingface.co/docs/transformers/model_doc/whisper) - speech-to-text (SOTA)
+- [RLHF](https://medium.com/aiguys/reinforcement-learning-from-human-feedback-instructgpt-and-chatgpt-693d00cb9c58) - human feedback.
 ### future tools used
 - [auth0](https://github.com/auth0) - authentication / tokens
 - [minio](https://github.com/minio/minio) - minio is an object storage platform
