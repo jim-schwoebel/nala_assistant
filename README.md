@@ -18,7 +18,7 @@ Nala is a voice-assistant framework to quickly build and prototype voice assista
 
 ![](https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/output.gif)
 
-Here are some key features for Developers:
+Here are some of Nala's key features:
 
 - **Extensible Architecture:** Nala offers a flexible and modular, python-centric FastAPI architecture that allows developers to extend its functionality with ease. Integrate new response models or TTS voice skins into your projects effortlessly.
 - **Native LLM Integration:** Nala integrates directly with the the [Dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b) LLM model - and makes it easy for you to integrate with others using an easy-to-follow strategy with helper functions.
