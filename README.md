@@ -1,7 +1,7 @@
 # Nala
-Nala is a voice-assistant framework to quickly build and prototype voice assistants within the greater context of the emerging large-language-model (LLM) landscape. With Nala you can easily intgrate with state-of-the-art (SOTA) transcription like [Whisper API](), text-to-speech synthesis engines like [](), and LLMs like Dolly/Blenderbot within a nice front-end powered with the Web Speech API.
+Nala is a voice-assistant framework to quickly build and prototype voice assistants within the greater context of the emerging large-language-model (LLM) landscape. With Nala you can easily intgrate with state-of-the-art (SOTA) transcription like [Whisper API](), text-to-speech synthesis engines like Microsoft's [SpeechT5 model](https://huggingface.co/microsoft/speecht5_tts), and LLMs like [Dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b) within a nice front-end - across any arbitrary wake word powered with the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API#javascript).
 
-- New visual here - 
+- New visual here - gif of system
 
 Here are some key features for Developers:
 
