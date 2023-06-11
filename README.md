@@ -133,6 +133,8 @@ Note that you can find a current list of browsers that support the Web Speech AP
 ![](https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/wspeeech_api.png?raw=true)
 
 ## maintainers
+![](https://static.wixstatic.com/media/55f531_a204ce54c8484c4294297f1252de3752~mv2.png/v1/fill/w_160,h_160,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/Erd%C5%91sLogoNewSmall.png)
+
 This project was incubated as a result of the [Erdos Fellowship program](https://www.erdosinstitute.org/become-a-member) - and since has resulted in a larger independent initiative.
 
 Here is a list of active maintainers to this project:
