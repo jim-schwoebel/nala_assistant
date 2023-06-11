@@ -3,6 +3,5 @@
     "super_users": ["jim@schwoebel.me"],
     "sounds": {"default": "chime", "options": ["chime", "bell"]}, 
     "voice": {"default": "bark", "options": ["microsoft", "bark"]}, 
-    "response_type": {"default": "dolly", 
-    "options": ["blender","dolly", "echo"]}, 
+    "response_type": {"default": "dolly", "options": ["blender","dolly", "echo"]}, 
     "language": {"default": "en-us", "options": ["en-us"]}}

@@ -559,7 +559,7 @@ def download_data(token: str = Depends(reuseable_oauth), db: Session = Depends(g
 	else:
 		raise HTTPException(
 			status_code=status.HTTP_404_NOT_FOUND,
-			detail="Could not find user",
+			detail="User is not allowed to download data.",
 		)	
 
 # if we make a ML model to predict relevancy 

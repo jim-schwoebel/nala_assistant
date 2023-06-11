@@ -56,6 +56,12 @@ Then run the app:
 ```
 uvicorn app:app --reload
 ```
+Note if you having trouble with the `uvicorn app:app --reload` command, you can try:
+```
+python3 -m uvicorn app:app --reload
+```
+
+And sometimes this make it work.
 
 You will now be able to visit localhost (`http://127.0.0.1:8000`) to use appication.
 
@@ -120,8 +126,7 @@ Here are the current settings that you can edit in th `settings.json` file:
     "super_users": ["jim@schwoebel.me"],
     "sounds": {"default": "chime", "options": ["chime", "bell"]}, 
     "voice": {"default": "bark", "options": ["microsoft", "bark"]}, 
-    "response_type": {"default": "dolly", 
-    "options": ["blender","dolly", "echo"]}, 
+    "response_type": {"default": "dolly", "options": ["blender","dolly", "echo"]}, 
     "language": {"default": "en-us", "options": ["en-us"]}}
 ```
 
