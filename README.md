@@ -114,6 +114,7 @@ Currently, Nala works on Chrome and Safari-based browsers based on [Web Speech A
 ![](https://github.com/jim-schwoebel/bark_assistant/blob/main/static/images/error.png)
 
 ## references 
+Here is a quick list of references for additional reading. 
 
 ### javascript front-end 
 - [audio.js](http://kolber.github.io/audiojs/) - playback audio alternative (setting)
@@ -124,11 +125,10 @@ Currently, Nala works on Chrome and Safari-based browsers based on [Web Speech A
 - [wavesurfer.js](https://wavesurfer-js.org/) - for enumerating last audio file generated in the browser
 ### feature extraction
 - [python_speech_features](https://github.com/jim-schwoebel/allie/blob/master/features/audio_features/pspeech_features.py) - audio feature extraction method useed
-- [audio_features - Allie](https://github.com/jim-schwoebel/allie/tree/master/features/audio_features)
 ### ML models (used)
 - [Dolly-v2-3b](https://huggingface.co/databricks/dolly-v2-3b) - LLM (Databricks) 
 - [SpeechT5 model](https://huggingface.co/microsoft/speecht5_tts) - text-to-speech synthesis (Microsoft)
 - [Whisper API](https://huggingface.co/docs/transformers/model_doc/whisper) - speech-to-text (SOTA)
 ### future tools used
+- [auth0](https://github.com/auth0) - authentication / tokens
 - [minio](https://github.com/minio/minio) - minio is an object storage platform
-- [auth0](https://github.com/auth0) - authentication
