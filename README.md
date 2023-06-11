@@ -8,7 +8,7 @@
 [![GitHub Issues](https://img.shields.io/github/issues/anfederico/Clairvoyant.svg)](https://github.com/jim-schwoebel/bark_assistant/blob/main/requirements.txt)
 [![License](https://img.shields.io/badge/license-Apache%202-blue)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)](https://github.com/users/jim-schwoebel/projects/2)
-![](https://img.shields.io/badge/github/stars/jim-schwoebel/bark_assistant?style=social)
+![](https://img.shields.io/github/stars/jim-schwoebel/bark_assistant?style=social)
    
  </p>
  
