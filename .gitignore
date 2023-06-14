@@ -4,3 +4,4 @@ private.pem
 .DS_Store
 .env
 queries/
+__pycache__/
