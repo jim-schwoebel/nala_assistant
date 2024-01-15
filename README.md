@@ -1,6 +1,6 @@
 
 <p align="center">
-   <img src="https://camo.githubusercontent.com/eeee9b9732ef382762afd4a9dfd9a126c850e377fb51ad5cd2654a1d5768acb6/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f56447a5647386c764e527566752f67697068792e676966">
+   <img src="https://camo.githubusercontent.com/b8be743a9ccf7b6f8f83b5037e933dd3ec7c8c23ca5f267efd4cd34a521ad16d/68747470733a2f2f6d656469612e67697068792e636f6d2f6d656469612f56447a5647386c764e527566752f67697068792e676966">
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 [![Python](https://img.shields.io/badge/python-v3.9+-blue.svg)]()
